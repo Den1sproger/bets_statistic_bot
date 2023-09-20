@@ -1,5 +1,4 @@
-from aiogram.types import (ReplyKeyboardMarkup,
-                           KeyboardButton)
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
 main_kb = ReplyKeyboardMarkup(
@@ -8,5 +7,13 @@ main_kb = ReplyKeyboardMarkup(
         [KeyboardButton('Голосование')],
         [KeyboardButton('Статистика')],
         [KeyboardButton('Подписаться')]
+    ]
+)
+
+sport_types_ikb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton('ФУТБОЛ', callback_data='voting_soccer')],
+        [InlineKeyboardButton('ХОККЕЙ', callback_data='voting_hockey')],
+        [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_basketball')]
     ]
 )

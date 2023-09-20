@@ -1,6 +1,8 @@
 from .db_work import Database
 
 
+PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
+
 
 def get_prompt_view_games(sport_type: str) -> str:
     return "SELECT game_key, sport, begin_time, first_team, first_coeff, second_team," \
@@ -50,9 +52,9 @@ def get_prompt_update_answer(chat_id: str,
 
 
 
-
 __all__ = [
     'Database',
+    'PROMPT_VIEW_CURRENT_CHAT_iDS',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
     'get_prompt_increase_current_index',

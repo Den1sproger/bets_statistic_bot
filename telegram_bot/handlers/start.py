@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Command
 from ..bot_config import dp
+from ..keyboards import main_kb
 
 
 
@@ -19,7 +20,7 @@ HELP_TEXT = """
 
 @dp.message_handler(Command('start'))
 async def start(message: types.Message) -> None:
-    await message.answer(WELCOME)
+    await message.answer(WELCOME, reply_markup=main_kb)
 
 
 @dp.message_handler(Command('help'))
