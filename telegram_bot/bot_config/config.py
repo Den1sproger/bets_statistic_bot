@@ -18,6 +18,6 @@ default_commands = [
     BotCommand('start', 'Запустить бота'),
     BotCommand('help', 'Помощь'),
     BotCommand('voting', 'Голосование'),
-    BotCommand('statistics', 'Статистика'),
-    BotCommand('subscribe', 'Подписаться')
+    BotCommand('myteam', 'Моя команда'),
+    BotCommand('statistics', 'Статистика')
 ]
