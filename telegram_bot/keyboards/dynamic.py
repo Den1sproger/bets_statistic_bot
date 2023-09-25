@@ -4,16 +4,19 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def get_question_ikb(quantity: int,
                      current_question_index: int,
-                     coeffs: list[str],
+                     coeffs: int,
                      answer: int = None) -> InlineKeyboardMarkup:
     # keyboard for the one question
-
+    team_1 = 'П1'
+    team_2 = 'П2'
+    draw = 'X'
+    
     if not answer: pass
-    elif answer == 1: team_1 = f"👉{team_1}👈"
-    elif answer == 2: team_2 = f"👉{team_2}👈"
-    else: draw = f"👉{draw}👈"
+    elif answer == 1: team_1 = f"{team_1}"
+    elif answer == 2: team_2 = f"{team_2}"
+    else: draw = f"{draw}"
 
-    if len(coeffs) == 3:
+    if coeffs == 3:
         inline_keyboard = [
             [
                 InlineKeyboardButton(team_1, callback_data='first_team'),
