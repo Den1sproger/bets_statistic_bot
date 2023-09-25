@@ -11,13 +11,29 @@ CREATE TABLE games
     draw_coeff varchar(10),
 	url varchar(255) NOT NULL,
     game_status int NOT NULL,
+    poole_first int NOT NULL,
+    poole_second int NOT NULL,
+    poole_draw int
 );
 
 CREATE TABLE users
 (
-	id serial PRIMARY KEY,
+    chat_id varchar(50) PRIMARY KEY,
     username varchar(32) NOT NULL,
+    positive_bets int NOT NULL,
+    negative_bets int NOT NULL,
+    roi float NOT NULL,
+    team_name varchar(50)
+);
+
+CREATE TABLE currents_users_roi
+(
     chat_id varchar(50) NOT NULL,
+    sport_type varchar(15) NOT NULL,
+    positive_bets int NOT NULL,
+    negative_bets int NOT NULL,
+    roi float NOT NULL,
+    CONSTRAINT chat_id_sport_type PRIMARY KEY (chat_id, sport_type)
 );
 
 CREATE TABLE answers
@@ -32,4 +48,11 @@ CREATE TABLE current_questions
 (
     chat_id varchar(50) PRIMARY KEY,
     current_index int NOT NULL
+);
+
+CREATE TABLE teams
+(
+    team_name varchar(50) PRIMARY KEY,
+    captain_chat_id varchar(50) NOT NULL,
+    roi float NOT NULL
 );
