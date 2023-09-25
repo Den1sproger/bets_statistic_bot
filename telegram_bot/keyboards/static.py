@@ -5,8 +5,8 @@ main_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
         [KeyboardButton('Голосование')],
-        [KeyboardButton('Статистика')],
-        [KeyboardButton('Подписаться')]
+        [KeyboardButton('Моя команда')],
+        [KeyboardButton('Статистика')]
     ]
 )
 
