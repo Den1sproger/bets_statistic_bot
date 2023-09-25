@@ -13,6 +13,13 @@ CLIENT_EMAIL = os.getenv('client_email')
 CLIENT_ID = os.getenv('client_id')
 CLIENT_X509_CERT_URL = os.getenv('client_x509_cert_url')
 
+# spreadsheet id
+SPREADSHEET_ID = os.getenv('spreadsheet_id')
+
+# spreadsheet urls
+GAMES_SPREADSHEET_URL = os.getenv('games_spreadsheet_url')
+STAT_MASS_SPREADSHEET_URL = os.getenv('stat_mass_spreadsheet_url')
+STAT_SPORTS_SPREADSHEET_URL = os.getenv('stat_sports_spreadsheet_url')
 
 # credentials as dict
 CREDENTIALS = {
