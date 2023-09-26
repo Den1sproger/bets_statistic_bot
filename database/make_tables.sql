@@ -23,7 +23,8 @@ CREATE TABLE users
     positive_bets int NOT NULL,
     negative_bets int NOT NULL,
     roi float NOT NULL,
-    team_name varchar(50)
+    team_name varchar(50),
+    all_roi float
 );
 
 CREATE TABLE currents_users_roi
