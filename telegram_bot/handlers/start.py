@@ -2,8 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from database import (Database,
                       get_prompt_add_user,
-                      PROMPT_VIEW_ALL_CHAT_IDS,
-                      PROMPT_ADD_ALL_ROI)
+                      PROMPT_VIEW_ALL_CHAT_IDS)
 from ..bot_config import dp
 from ..keyboards import main_kb
 
@@ -34,9 +33,6 @@ async def start(message: types.Message) -> None:
 
     if not user_chat_id in users:
         db.action(get_prompt_add_user(username, user_chat_id))
-        
-    if not users:
-        db.action(PROMPT_ADD_ALL_ROI)
         
     await message.answer(WELCOME, reply_markup=main_kb)
 

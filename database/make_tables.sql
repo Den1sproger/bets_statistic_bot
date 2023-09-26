@@ -16,17 +16,30 @@ CREATE TABLE games
     poole_draw int
 );
 
+
 CREATE TABLE users
 (
     id serial PRIMARY KEY,
-    chat_id varchar(50) NOT NULL,
+    chat_id varchar(50),
     username varchar(32) NOT NULL,
     positive_bets int NOT NULL,
     negative_bets int NOT NULL,
     roi float NOT NULL,
     team_name varchar(50),
-    all_roi float
 );
+-- adding data to the table immediately after creation
+INSERT INTO users (username, positive_bets, negative_betsm, roi) VALUES ('poole', 0, 0, 0)
+
+
+CREATE TABLE positive_votes_poole
+(
+    first_team int NOT NULL,
+    second_team int NOT NULL,
+    draw int NOT NULL
+);
+-- adding data to the table immediately after creation
+INSERT INTO positive_votes_poole (first_team, second_team, draw) VALUES (0, 0, 0);
+
 
 CREATE TABLE currents_users_roi
 (
@@ -38,6 +51,7 @@ CREATE TABLE currents_users_roi
     CONSTRAINT chat_id_sport_type PRIMARY KEY (chat_id, sport_type)
 );
 
+
 CREATE TABLE answers
 (
     chat_id varchar(50) REFERENCES users(chat_id),
@@ -46,11 +60,13 @@ CREATE TABLE answers
     CONSTRAINT chat_key_tourn PRIMARY KEY (chat_id, game_key)
 );
 
+
 CREATE TABLE current_questions
 (
     chat_id varchar(50) PRIMARY KEY,
     current_index int NOT NULL
 );
+
 
 CREATE TABLE teams
 (

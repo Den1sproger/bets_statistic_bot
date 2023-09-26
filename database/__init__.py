@@ -3,7 +3,6 @@ from .db_work import Database
 
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
-PROMPT_ADD_ALL_ROI = "UPDATE users SET all_roi=0 WHERE id=(SELECT id FROM(SELECT MIN(id) FROM users) as res);"
 
 
 
@@ -65,7 +64,6 @@ __all__ = [
     'Database',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
-    'PROMPT_ADD_ALL_ROI',
     'get_prompt_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
