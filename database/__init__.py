@@ -1,6 +1,7 @@
 from .db_work import Database
 
 
+SPORT_TYPES = ('SOCCER', 'HOCKEY', 'BASKETBALL')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 
@@ -62,6 +63,7 @@ def get_prompt_update_answer(chat_id: str,
 
 __all__ = [
     'Database',
+    'SPORT_TYPES',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
     'get_prompt_add_user',
