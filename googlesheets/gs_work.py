@@ -14,14 +14,11 @@ class Connect:
     """Base class for the sheet with the users data"""
 
 
-    def __init__(self,
-                 spreadsheet_url: str,
-                 *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         self.gc = gspread.service_account_from_dict(CREDENTIALS,
                                                     client_factory=gspread.BackoffClient)
         self.spreadsheet = self.gc.open_by_key(SPREADSHEET_ID)
-        self.worksheet = self.spreadsheet.worksheet(spreadsheet_url)
-
+        
 
     def __del__(self):
         return
@@ -42,9 +39,10 @@ class Stat_mass(Connect):
 
 
     def __init__(self, *args, **kwargs):
-        super().__init__(STAT_MASS_SPREADSHEET_URL)
-
+        super().__init__()
+        self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
     
+
     def add_user(self,
                  chat_id: str,
                  username: str) -> None:
@@ -75,7 +73,8 @@ class Stat_sport_types(Connect):
 
 
     def __init__(self, *args, **kwargs):
-        super().__init__(STAT_SPORTS_SPREADSHEET_URL)
+        super().__init__()
+        self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
         self.cells = string.ascii_uppercase
 
 
@@ -103,10 +102,10 @@ class Stat_sport_types(Connect):
             for sport_type in SPORT_TYPES:
                 update_data.append(
                     {
-                        f'{self.__get_column("chat_id", sport_type)}{row}',
-                        [[chat_id, 0, 0, 0]]
+                        'range': f'{self.__get_column("chat_id", sport_type)}{row}',
+                        'values': [[chat_id, 0, 0, 0]]
                     }
-                )        
+                )
             self.worksheet.batch_update(update_data)
 
     
