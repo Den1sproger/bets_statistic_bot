@@ -7,10 +7,14 @@ PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 
 
 
-def get_prompt_add_user(username: str,
-                        chat_id: str) -> str:
-    return f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi)" \
-            f"VALUES ('{username}', '{chat_id}', 0, 0, 0);"
+def get_prompts_add_user(username: str,
+                        chat_id: str) -> list[str]:
+    prompts = [f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi)" \
+            f"VALUES ('{username}', '{chat_id}', 0, 0, 0);"]
+    for sport_type in SPORT_TYPES:
+        prompts.append(f"INSERT INTO currents_users_roi (chat_id, sport_type, positive_bets, negative_bets, roi)" \
+                       f"VALUES ('{chat_id}', '{sport_type}', 0, 0, 0);")
+    return prompts
 
 
 def get_prompt_view_games(sport_type: str) -> str:
@@ -66,7 +70,7 @@ __all__ = [
     'SPORT_TYPES',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
-    'get_prompt_add_user',
+    'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
     'get_prompt_increase_current_index',

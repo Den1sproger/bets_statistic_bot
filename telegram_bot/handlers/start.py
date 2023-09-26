@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from googlesheets import Stat_mass, Stat_sport_types
 from database import (Database,
-                      get_prompt_add_user,
+                      get_prompts_add_user,
                       PROMPT_VIEW_ALL_CHAT_IDS)
 from ..bot_config import dp
 from ..keyboards import main_kb
@@ -33,8 +33,8 @@ async def start(message: types.Message) -> None:
     users = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_ALL_CHAT_IDS)]
 
     if not user_chat_id in users:
-        db.action(get_prompt_add_user(username, user_chat_id))
-    
+        db.action(*get_prompts_add_user(username, user_chat_id))
+
     # add user to main sheet
     sm = Stat_mass()
     sm.add_user(user_chat_id, username)

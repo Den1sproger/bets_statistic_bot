@@ -17,7 +17,7 @@ class Database:
         return connection
 
 
-    def action(self, *queries: str) -> None:
+    def action(self, *queries) -> None:
         connection = self.connect_to_db()
 
         with connection:
