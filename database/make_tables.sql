@@ -18,7 +18,8 @@ CREATE TABLE games
 
 CREATE TABLE users
 (
-    chat_id varchar(50) PRIMARY KEY,
+    id serial PRIMARY KEY,
+    chat_id varchar(50) NOT NULL,
     username varchar(32) NOT NULL,
     positive_bets int NOT NULL,
     negative_bets int NOT NULL,
