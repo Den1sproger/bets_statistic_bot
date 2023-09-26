@@ -23,6 +23,10 @@ class Connect:
         self.worksheet = self.spreadsheet.worksheet(spreadsheet_url)
 
 
+    def __del__(self):
+        return
+
+
     
 class Stat_mass(Connect):
     """Class for the work with the data in the worksheet with the all users"""
@@ -88,9 +92,7 @@ class Stat_sport_types(Connect):
             return self.cells[self.cells.index(self.CELLS_COLS[column]) + self.OFFSET * 2]
 
 
-    def add_user(self,
-                 chat_id: str,
-                 username: str) -> None:
+    def add_user(self, chat_id: str) -> None:
         # add user in table
         chat_ids = self.worksheet.col_values(1)
         if chat_id not in chat_ids:
@@ -102,7 +104,7 @@ class Stat_sport_types(Connect):
                 update_data.append(
                     {
                         f'{self.__get_column("chat_id", sport_type)}{row}',
-                        [[chat_id, username, 0, 0, 0]]
+                        [[chat_id, 0, 0, 0]]
                     }
                 )        
             self.worksheet.batch_update(update_data)
