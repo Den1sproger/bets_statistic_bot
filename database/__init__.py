@@ -3,12 +3,19 @@ from .db_work import Database
 
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
+PROMPT_ADD_ALL_ROI = "UPDATE users SET all_roi=0 WHERE id=(SELECT id FROM(SELECT MIN(id) FROM users) as res);"
+
 
 
 def get_prompt_add_user(username: str,
-                        chat_id: str) -> str:
-    return f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi)" \
-           f"VALUES ('{username}', '{chat_id}', 0, 0, 0);"
+                        chat_id: str,
+                        all_roi: str = 'NULL') -> str:
+    return f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi, all_roi)" \
+            f"VALUES ('{username}', '{chat_id}', 0, 0, 0, {all_roi});"
+
+
+# def get_prompt_add_all_roi()
+
 
 def get_prompt_view_games(sport_type: str) -> str:
     return "SELECT game_key, sport, begin_time, first_team, first_coeff, second_team," \
@@ -62,6 +69,7 @@ __all__ = [
     'Database',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
+    'PROMPT_ADD_ALL_ROI',
     'get_prompt_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
