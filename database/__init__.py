@@ -64,6 +64,10 @@ def get_prompt_update_answer(chat_id: str,
     return f"UPDATE answers SET answer={new_answer} WHERE chat_id='{chat_id}' AND game_key='{game_key}';"
 
 
+def get_prompt_view_votes(game_key: str) -> str:
+    return f"SELECT poole_first, poole_second, poole_draw FROM games WHERE game_key='{game_key}';"
+
+
 
 __all__ = [
     'Database',
@@ -81,4 +85,5 @@ __all__ = [
     'get_prompt_add_answer',
     'get_prompt_view_answer',
     'get_prompt_update_answer',
+    'get_prompt_view_votes'
 ]
