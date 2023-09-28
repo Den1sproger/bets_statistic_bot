@@ -1,6 +1,6 @@
 from aiogram import types
 from ..bot_config import dp
-from ..keyboards import get_question_ikb
+from ..keyboards import sport_types_ikb, get_question_ikb
 from database import (Database,
                       get_prompt_view_games,
                       PROMPT_VIEW_CURRENT_CHAT_iDS,
@@ -9,7 +9,10 @@ from database import (Database,
                       get_prompt_view_current_info,
                       get_prompt_view_answer,
                       get_prompt_update_answer,
-                      get_prompt_add_answer)
+                      get_prompt_add_answer,
+                      get_prompt_increase_current_index,
+                      get_prompt_decrease_current_index,
+                      get_prompt_delete_current_info)
 
 
 
@@ -105,48 +108,6 @@ async def update_questions_data(callback: types.CallbackQuery,
     await callback.message.edit_text(msg_text)
     await callback.message.edit_reply_markup(reply_markup=reply_markup)
 
-    
-
-async def answer(answer: int,
-                 callback: types.CallbackQuery) -> None:
-    user_chat_id = str(callback.message.chat.id)
-    db = Database()
-
-    data, current_game = get_current_data(db, user_chat_id)
-
-    game_key = current_game['game_key']
-    index = data['index']
-    tournament = data['tournament']
-    type_= data['type']
-
-    reply_markup, _ = get_update_msg(
-        game=current_game, answer=answer, index=index,
-        tournament=tournament, type_= type_
-    )
-
-    old_answer = db.get_data_list(
-        get_prompt_view_answer(
-            chat_id=user_chat_id,
-            tournament=tournament, game_key=game_key
-        )
-    )
-    prompt = ''
-    if old_answer:
-        if old_answer[0]['answer'] == answer:
-            return
-        prompt = get_prompt_update_answer(
-            chat_id=user_chat_id,
-            game_key=game_key, new_answer=answer
-        )
-    else:
-        prompt = get_prompt_add_answer(
-            chat_id=user_chat_id,
-            game_key=game_key, answer=answer
-        )
-    db.action(prompt)
-    
-    await callback.message.edit_reply_markup(reply_markup=reply_markup)
-
 
 
 # selected sport type for voting
@@ -177,3 +138,98 @@ async def get_voting_board(callback: types.CallbackQuery) -> None:
 
     else:
         await callback.answer('В данный момент голосование недоступно')
+
+
+    
+async def answer(answer: int,
+                 callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
+    db = Database()
+
+    data, current_game = get_current_data(db, user_chat_id)
+
+    game_key = current_game['game_key']
+    index = data['index']
+    type_= data['type']
+
+    reply_markup, _ = get_update_msg(
+        game=current_game, answer=answer, index=index, type_= type_
+    )
+
+    old_answer = db.get_data_list(
+        get_prompt_view_answer(
+            chat_id=user_chat_id, game_key=game_key
+        )
+    )
+    prompts = []
+    if old_answer:
+        if old_answer[0]['answer'] == answer:
+            return
+        prompts.append(
+            get_prompt_update_answer(
+                chat_id=user_chat_id,
+                game_key=game_key, new_answer=answer
+            )
+        )
+    else:
+        prompts.append(
+            get_prompt_add_answer(
+                chat_id=user_chat_id,
+                game_key=game_key, answer=answer
+            )
+        )
+        
+    db.action(*prompts)
+    
+    await callback.message.edit_reply_markup(reply_markup=reply_markup)
+
+
+
+# next question
+@dp.callback_query_handler(lambda callback: callback.data == 'next_question')
+async def next_question(callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
+    db = Database()
+    db.action(get_prompt_increase_current_index(user_chat_id))
+
+    await update_questions_data(callback)
+
+
+# previous question
+@dp.callback_query_handler(lambda callback: callback.data == 'previous_question')
+async def previous_question(callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
+    db = Database()
+    db.action(get_prompt_decrease_current_index(user_chat_id))
+
+    await update_questions_data(callback)
+
+
+
+@dp.callback_query_handler(lambda callback: callback.data == 'first_team')
+async def first_team(callback: types.CallbackQuery) -> None:
+    await answer(answer=1, callback=callback)
+
+
+@dp.callback_query_handler(lambda callback: callback.data == 'second_team')
+async def second_team(callback: types.CallbackQuery) -> None:
+    await answer(answer=2, callback=callback)
+
+
+@dp.callback_query_handler(lambda callback: callback.data == 'draw')
+async def draw(callback: types.CallbackQuery) -> None:
+    await answer(answer=3, callback=callback)
+
+
+# come back to the menu of users tournaments
+@dp.callback_query_handler(lambda callback: callback.data == 'back_to_my_tournaments')
+async def back_to_tourns(callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
+    db = Database()
+
+    db.action(
+        get_prompt_delete_current_info(user_chat_id)
+    )
+
+    await callback.message.edit_text('Выберите вид спорта')
+    await callback.message.edit_reply_markup(reply_markup=sport_types_ikb)

@@ -29,9 +29,9 @@ def get_question_ikb(quantity: int,
         part_second = int(round(100 * (poole_second/all_votes), 0))
         part_draw = int(round(100 * (poole_draw/all_votes), 0))
 
-        team_1 = f"{part_first}% {poole_first} голосов"
-        team_2 = f"{part_second}% {poole_second} голосов"
-        draw = f"{part_draw}% {poole_draw} голосов"
+        team_1 = f"{part_first}% - {poole_first} голосов"
+        team_2 = f"{part_second}% - {poole_second} голосов"
+        draw = f"{part_draw}% - {poole_draw} голосов"
 
         if answer == 1: team_1 = f"👉{team_1}👈"
         elif answer == 2: team_2 = f"👉{team_2}👈"

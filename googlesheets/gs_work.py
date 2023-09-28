@@ -2,7 +2,10 @@ import string
 
 import gspread
 
-from database import SPORT_TYPES
+from database import (Database,
+                      PROMPT_VIEW_GAMES,
+                      SPORT_TYPES,
+                      get_prompt_view_votes)
 from .config import (SPREADSHEET_ID,
                      CREDENTIALS,
                      STAT_MASS_SPREADSHEET_URL,
@@ -121,10 +124,53 @@ class Stat_sport_types(Connect):
     #         ) 
     #     self.worksheet.batch_update(update_data)
 
-    
+
+class Games(Connect):
+    """"""
+
+    CELLS_COLS = {
+        'game_number': 'A',
+        'sport': 'B',
+        'begin_time': 'C',
+        'teams': 'D',
+        'coefficients': 'E',
+        'url': 'F',
+        'poole': 'G'
+    }
+    SHEET_NAME = 'Матчи'
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
+
+
+    def update_votes(self, team_name: str, game_data: dict) -> None:
+        db = Database()
+        games = db.get_data_list(PROMPT_VIEW_GAMES)
+
+        game_key = game_data['game_key']
+
+        count = 1
+        votes: int
+
+        for game in games:
+            teams = len(game['coeffs'])
+
+            if game['game_key'] == game_key:
+
+                for team, db_key in zip(game['coeffs'], ('poole_first', 'poole_second', 'poole_draw')):
+                    count += 1
+                    if team == team_name:
+                        votes = game[db_key]
+                        break
+
+                break
+            count += teams
+            
+        self.worksheet.update(f"{self.CELLS_COLS['poole']}{count}", votes)
 
 
 
 
-
-
+        
