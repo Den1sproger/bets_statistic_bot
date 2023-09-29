@@ -5,6 +5,7 @@ SPORT_TYPES = ('SOCCER', 'HOCKEY', 'BASKETBALL')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
+PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi FROM users WHERE username='poole';"
 
 
 
@@ -81,6 +82,22 @@ def get_prompt_delete_current_info(chat_id: str) -> str:
     return f"DELETE FROM current_questions WHERE chat_id='{chat_id}';"
 
 
+def get_prompt_view_user_stat(chat_id: str) -> str:
+    return f"SELECT positive_bets, negative_bets, roi FROM users WHERE chat_id='{chat_id}';"
+
+
+def get_prompt_view_user_team(chat_id: str) -> str:
+    return f"SELECT team_name FROM users WHERE chat_id='{chat_id}';"
+
+
+def get_prompt_view_team_stat(team_name: str) -> str:
+    return f"SELECT positive_bets, negative_bets, roi FROM teams WHERE team_name='{team_name}';"
+
+
+# def get_prompt_view_teammates(team_name: str) -> str:
+#     return f"SELECT * FROM users WHERE team_name='{team_name}';"
+
+
 
 __all__ = [
     'Database',
@@ -88,6 +105,7 @@ __all__ = [
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
     'PROMPT_VIEW_GAMES',
+    'PROMPT_VIEW_POOLE_STAT',
     'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
@@ -102,5 +120,8 @@ __all__ = [
     'get_prompt_view_votes',
     'get_prompt_increase_current_index',
     'get_prompt_decrease_current_index',
-    'get_prompt_delete_current_info'
+    'get_prompt_delete_current_info',
+    'get_prompt_view_user_stat',
+    'get_prompt_view_user_team',
+    'get_prompt_view_team_stat'
 ]
