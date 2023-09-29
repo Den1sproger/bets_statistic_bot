@@ -57,7 +57,7 @@ CREATE TABLE answers
     chat_id varchar(50) REFERENCES users(chat_id),
     game_key varchar(20) REFERENCES games(game_key),
     answer int NOT NULL,
-    CONSTRAINT chat_key_tourn PRIMARY KEY (chat_id, game_key)
+    CONSTRAINT chat_key PRIMARY KEY (chat_id, game_key)
 );
 
 
@@ -72,5 +72,8 @@ CREATE TABLE teams
 (
     team_name varchar(50) PRIMARY KEY,
     captain_chat_id varchar(50) NOT NULL,
+    positive_bets int NOT NULL,
+    negative_bets int NOT NULL,
+    teammates int NOT NULL,
     roi float NOT NULL
 );

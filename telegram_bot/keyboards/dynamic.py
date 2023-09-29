@@ -1,5 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from database import Database, get_prompt_view_votes
+from database import (Database,
+                      get_prompt_view_votes,
+                      get_prompt_view_captain)
 
 
 
@@ -61,5 +63,34 @@ def get_question_ikb(quantity: int,
         [InlineKeyboardButton('Назад', callback_data='back_to_sport_types')]
     )
 
+    ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return ikb
+
+
+def get_teammates_ikb(teammates: list,
+                      team_name: str,
+                      user_chat_id: str) -> None:
+    inline_keyboard = []
+    for user in teammates:
+        inline_keyboard.append([
+            InlineKeyboardButton(text=user['username'], callback_data=f"view_teammate_{user['chat_id']}")
+        ])
+
+    db = Database()
+    captain = db.get_data_list(
+        get_prompt_view_captain(team_name)
+    )[0]['captain_chat_id']
+
+    if captain != user_chat_id:
+        inline_keyboard.append(
+            [InlineKeyboardButton('Выйти из команды', callback_data='leave_team')]
+        )
+    else:
+        inline_keyboard + [
+            [InlineKeyboardButton('Добавить участника', callback_data='add_teammate')],
+            [InlineKeyboardButton('Удалить команду', callback_data='delete_team')],
+            [InlineKeyboardButton('Выйти из команды', callback_data='leave_team_admin')]
+        ]
+        
     ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return ikb

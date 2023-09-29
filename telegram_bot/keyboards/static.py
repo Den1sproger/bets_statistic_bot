@@ -17,3 +17,15 @@ sport_types_ikb = InlineKeyboardMarkup(
         [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_basketball')]
     ]
 )
+
+team_create_ikb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton('Создать команду', callback_data='create_team')]
+    ]
+)
+
+confirm_leave_ikb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton('Подтвердить', callback_data='confirm_leave')]
+    ]
+)

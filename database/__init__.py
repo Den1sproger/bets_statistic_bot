@@ -6,6 +6,7 @@ PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
 PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi FROM users WHERE username='poole';"
+PROMPT_VIEW_TEAMS = "SELECT team_name FROM teams;"
 
 
 
@@ -94,8 +95,25 @@ def get_prompt_view_team_stat(team_name: str) -> str:
     return f"SELECT positive_bets, negative_bets, roi FROM teams WHERE team_name='{team_name}';"
 
 
-# def get_prompt_view_teammates(team_name: str) -> str:
-#     return f"SELECT * FROM users WHERE team_name='{team_name}';"
+def get_prompt_view_teammates(team_name: str) -> str:
+    return f"SELECT * FROM users WHERE team_name='{team_name}';"
+
+
+def get_prompt_view_captain(team_name: str) -> str:
+    return f"SELECT captain_chat_id FROM teams WHERE team_name='{team_name}';"
+
+
+def get_prompt_create_team(team_name: str,
+                           captain: str) -> list[str]:
+    return [
+        "INSERT INTO teams (team_name, captain_chat_id, positive bets, negative_bets, roi)" \
+        f"VALUES ('{team_name}', '{captain}', 0, 0, 0);",
+        f"UPDATE users SET team_name='{team_name}' WHERE chat_id='{captain}';"
+    ]
+
+
+def get_prompt_leave_team(chat_id: str) -> str:
+    return f"UPDATE users SET team_name=NULL WHERE chat_id='{chat_id}';"
 
 
 
@@ -106,6 +124,7 @@ __all__ = [
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
     'PROMPT_VIEW_GAMES',
     'PROMPT_VIEW_POOLE_STAT',
+    'PROMPT_VIEW_TEAMS',
     'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
@@ -123,5 +142,9 @@ __all__ = [
     'get_prompt_delete_current_info',
     'get_prompt_view_user_stat',
     'get_prompt_view_user_team',
-    'get_prompt_view_team_stat'
+    'get_prompt_view_team_stat',
+    'get_prompt_view_teammates',
+    'get_prompt_view_captain',
+    'get_prompt_create_team',
+    'get_prompt_leave_team'
 ]

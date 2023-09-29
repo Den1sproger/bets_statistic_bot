@@ -4,23 +4,13 @@ from database import (Database,
                       get_prompt_view_user_stat,
                       get_prompt_view_user_team,
                       get_prompt_view_team_stat,
+                      get_prompt_view_teammates,
                       PROMPT_VIEW_POOLE_STAT)
 from ..bot_config import dp
-from ..keyboards import sport_types_ikb
+from ..keyboards import (sport_types_ikb,
+                         team_create_ikb,
+                         get_teammates_ikb)
 
-
-
-sport_symbols = {
-    'ФУТБОЛ': ' ⚽️⚽️⚽️',
-    'ХОККЕЙ': '🏒🏒🏒',
-    'БАСКЕТБОЛ': '🏀🏀🏀'
-}
-
-questions = {
-    'SOCCER': [],
-    'HOCKEY': [],
-    'BASKETBALL': []
-}
 
 
 @dp.message_handler(Text(equals='Голосование'))
@@ -29,18 +19,35 @@ async def voting(message: types.Message) -> None:
     await message.answer('Выберите вид спорта', reply_markup=sport_types_ikb)
 
 
+
 @dp.message_handler(Text(equals='Моя команда'))
 @dp.message_handler(Command('myteam'))
 async def my_team(message: types.Message) -> None:
     user_chat_id = str(message.chat.id)
 
-    # db = Database()
-    # user_team = db.get_data_list(
-    #     get_prompt_view_user_team(user_chat_id)
-    # )[0]['team_name']
-    # if user_team:
-    #     teammates = db.get_data_list()
-    
+    db = Database()
+    user_team = db.get_data_list(
+        get_prompt_view_user_team(user_chat_id)
+    )[0]['team_name']
+    if user_team:
+        teammates = db.get_data_list(
+            get_prompt_view_teammates(team_name=user_team)
+        )
+        teammates = [i['username'] for i in teammates]
+
+        await message.answer(
+            text='Список команды:',
+            reply_markup=get_teammates_ikb(
+                teammates=teammates, user_chat_id=user_chat_id,
+                team_name=user_team
+            )
+        )
+    else:
+        await message.answer(
+            text='Вы не состоите в команде, можете создать команду и вы будете капитаном команды',
+            reply_markup=team_create_ikb
+        )
+
 
 
 @dp.message_handler(Text(equals='Статистика'))
