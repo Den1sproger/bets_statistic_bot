@@ -4,6 +4,7 @@ from .db_work import Database
 SPORT_TYPES = ('SOCCER', 'HOCKEY', 'BASKETBALL')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
+PROMPT_VIEW_GAMES = "SELECT * FROM games;"
 
 
 
@@ -68,12 +69,25 @@ def get_prompt_view_votes(game_key: str) -> str:
     return f"SELECT poole_first, poole_second, poole_draw FROM games WHERE game_key='{game_key}';"
 
 
+def get_prompt_increase_current_index(chat_id: str) -> str:
+    return f"UPDATE current_questions SET current_index=current_index+1 WHERE chat_id='{chat_id}';"
+
+
+def get_prompt_decrease_current_index(chat_id: str)-> str:
+    return f"UPDATE current_questions SET current_index=current_index-1 WHERE chat_id='{chat_id}';"
+
+
+def get_prompt_delete_current_info(chat_id: str) -> str:
+    return f"DELETE FROM current_questions WHERE chat_id='{chat_id}';"
+
+
 
 __all__ = [
     'Database',
     'SPORT_TYPES',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
+    'PROMPT_VIEW_GAMES',
     'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
@@ -85,5 +99,8 @@ __all__ = [
     'get_prompt_add_answer',
     'get_prompt_view_answer',
     'get_prompt_update_answer',
-    'get_prompt_view_votes'
+    'get_prompt_view_votes',
+    'get_prompt_increase_current_index',
+    'get_prompt_decrease_current_index',
+    'get_prompt_delete_current_info'
 ]
