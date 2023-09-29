@@ -221,8 +221,8 @@ async def draw(callback: types.CallbackQuery) -> None:
     await answer(answer=3, callback=callback)
 
 
-# come back to the menu of users tournaments
-@dp.callback_query_handler(lambda callback: callback.data == 'back_to_my_tournaments')
+# come back to the menu of sport_types
+@dp.callback_query_handler(lambda callback: callback.data == 'back_to_sport_types')
 async def back_to_tourns(callback: types.CallbackQuery) -> None:
     user_chat_id = str(callback.message.chat.id)
     db = Database()

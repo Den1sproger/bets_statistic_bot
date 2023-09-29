@@ -58,7 +58,7 @@ def get_question_ikb(quantity: int,
         InlineKeyboardButton('>', callback_data='next_question')
     ])
     inline_keyboard.append(
-        [InlineKeyboardButton('Назад', callback_data='back_to_sport_type')]
+        [InlineKeyboardButton('Назад', callback_data='back_to_sport_types')]
     )
 
     ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
