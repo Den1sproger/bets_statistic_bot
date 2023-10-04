@@ -64,7 +64,8 @@ CREATE TABLE answers
 CREATE TABLE current_questions
 (
     chat_id varchar(50) PRIMARY KEY,
-    current_index int NOT NULL
+    current_index int NOT NULL,
+    sport_type varchar(255) NOT NULL
 );
 
 

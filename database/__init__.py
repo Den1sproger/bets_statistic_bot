@@ -26,7 +26,7 @@ def get_prompt_view_games(sport_type: str) -> str:
     
 
 def get_prompt_view_current_info(chat_id: str) -> str:
-    return f"SELECT current_index FROM current_questions WHERE chat_id='{chat_id}';"
+    return f"SELECT current_index, sport_type FROM current_questions WHERE chat_id='{chat_id}';"
 
 
 def get_prompt_increase_current_index(chat_id: str) -> str:
@@ -38,12 +38,13 @@ def get_prompt_decrease_current_index(chat_id: str)-> str:
 
 
 def get_prompt_update_current_index(chat_id: str,
-                                    new_index: int) -> str:
+                                    new_index: int = 0) -> str:
     return f"UPDATE current_questions SET current_index={new_index} WHERE chat_id='{chat_id}';"
 
 
-def get_prompt_add_current_info(chat_id: str) -> str:
-    return f"INSERT INTO current_questions (chat_id, current_index) VALUES ('{chat_id}', 0);"
+def get_prompt_add_current_info(chat_id: str,
+                                sport_type: str) -> str:
+    return f"INSERT INTO current_questions (chat_id, current_index, sport_type) VALUES ('{chat_id}', 0, '{sport_type}');"
 
 
 def get_prompt_delete_current_info(chat_id: str) -> str:

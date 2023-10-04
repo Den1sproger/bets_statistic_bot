@@ -23,20 +23,20 @@ sport_symbols = {
 }
 
 questions = {
-    'SOCCER': [],
-    'HOCKEY': [],
-    'BASKETBALL': []
+    'Футбол': [],
+    'Хоккей': [],
+    'Баскетбол': []
 }
 
 
 def get_current_data(db: Database,
-                     chat_id: str,
-                     sport_type: str) -> dict:
+                     chat_id: str) -> dict:
     data = db.get_data_list(
         get_prompt_view_current_info(chat_id)
     )[0]
 
     current_index = data.get('current_index')
+    sport_type = data.get('sport_type')
 
     games_number = len(questions[sport_type])
     if current_index < 0:
@@ -48,7 +48,7 @@ def get_current_data(db: Database,
 
     current_game = questions[sport_type][current_index]
 
-    return current_index, current_game
+    return current_index, sport_type, current_game
 
 
 
@@ -83,11 +83,10 @@ def get_update_msg(game: dict,
 
 
 # update data of question for the message and edit the message
-async def update_questions_data(callback: types.CallbackQuery,
-                                sport_type: str) -> None:
+async def update_questions_data(callback: types.CallbackQuery) -> None:
     user_chat_id = str(callback.message.chat.id)
     db = Database()
-    current_index, current_game = get_current_data(db, user_chat_id, sport_type)
+    current_index, sport_type, current_game = get_current_data(db, user_chat_id)
 
     answer = db.get_data_list(
         get_prompt_view_answer(
@@ -102,7 +101,7 @@ async def update_questions_data(callback: types.CallbackQuery,
         
     reply_markup, msg_text = get_update_msg(
         game=current_game, answer=answer,
-        index=current_index, type_=sport_type
+        index=current_index, sport_type=sport_type
     )
     
     await callback.message.edit_text(msg_text)
@@ -128,13 +127,13 @@ async def get_voting_board(callback: types.CallbackQuery) -> None:
         chat_ids = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_CURRENT_CHAT_iDS)]
         if user_chat_id not in chat_ids:
             db.action(
-                get_prompt_add_current_info(user_chat_id)
+                get_prompt_add_current_info(user_chat_id, sport_type)
             )
         else:
             db.action(
                 get_prompt_update_current_index(user_chat_id)
             )
-        await update_questions_data(callback, sport_type)
+        await update_questions_data(callback)
 
     else:
         await callback.answer('В данный момент голосование недоступно')
