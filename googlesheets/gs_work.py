@@ -145,32 +145,31 @@ class Games(Connect):
         self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
 
 
-    def update_votes(self, team_name: str, game_data: dict) -> None:
+    def update_votes(self, answer: int, game_key: str) -> None:
+        # update votes in te last column for the one team
         db = Database()
         games = db.get_data_list(PROMPT_VIEW_GAMES)
-
-        game_key = game_data['game_key']
 
         count = 1
         votes: int
 
         for game in games:
-            teams = len(game['coeffs'])
+            teams = [game['first_team'], game['second_team']]
+            draw = game['draw_coeff']
+            if draw:
+                teams.append(draw)
 
             if game['game_key'] == game_key:
-
-                for team, db_key in zip(game['coeffs'], ('poole_first', 'poole_second', 'poole_draw')):
+                
+                for team, db_key in zip(teams, ('poole_first', 'poole_second', 'poole_draw')):
                     count += 1
-                    if team == team_name:
+
+                    team_number = teams.index(team) + 1
+                    if (team_number == answer):
                         votes = game[db_key]
                         break
 
                 break
-            count += teams
+            count += len(teams)
             
         self.worksheet.update(f"{self.CELLS_COLS['poole']}{count}", votes)
-
-
-
-
-        

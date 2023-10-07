@@ -17,7 +17,7 @@ def get_question_ikb(quantity: int,
         draw = 'X'
     else:
         db = Database()
-        votes_data = db.get_data_list(get_prompt_view_votes(game_key))
+        votes_data = db.get_data_list(get_prompt_view_votes(game_key))[0]
 
         poole_first = votes_data['poole_first']
         poole_second = votes_data['poole_second']

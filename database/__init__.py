@@ -10,6 +10,16 @@ PROMPT_VIEW_TEAMS = "SELECT team_name FROM teams;"
 
 
 
+def get_prompt_add_vote(game_key: str,
+                        answer: int) -> str:
+    teams = {
+        1: 'poole_first',
+        2: 'poole_second',
+        3: 'poole_draw'
+    }
+    return f"UPDATE games SET {teams[answer]}={teams[answer]}+1 WHERE game_key='{game_key}';"
+
+
 def get_prompts_add_user(username: str,
                         chat_id: str) -> list[str]:
     prompts = [f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi)" \
@@ -54,7 +64,7 @@ def get_prompt_delete_current_info(chat_id: str) -> str:
 def get_prompt_add_answer(chat_id: str,
                           answer: int,
                           game_key: str) -> str:
-    return f"INSERT INTO answers (chat_id, game_key, tournament, answer) VALUES ('{chat_id}', '{game_key}', {answer});"
+    return f"INSERT INTO answers (chat_id, game_key, answer) VALUES ('{chat_id}', '{game_key}', {answer});"
 
 
 def get_prompt_view_answer(chat_id: str,
@@ -126,6 +136,7 @@ __all__ = [
     'PROMPT_VIEW_GAMES',
     'PROMPT_VIEW_POOLE_STAT',
     'PROMPT_VIEW_TEAMS',
+    'get_prompt_add_vote',
     'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',

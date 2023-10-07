@@ -1,6 +1,7 @@
 from aiogram import types
 from ..bot_config import dp
 from ..keyboards import sport_types_ikb, get_question_ikb
+from googlesheets import Games
 from database import (Database,
                       get_prompt_view_games,
                       PROMPT_VIEW_CURRENT_CHAT_iDS,
@@ -12,7 +13,8 @@ from database import (Database,
                       get_prompt_add_answer,
                       get_prompt_increase_current_index,
                       get_prompt_decrease_current_index,
-                      get_prompt_delete_current_info)
+                      get_prompt_delete_current_info,
+                      get_prompt_add_vote)
 
 
 
@@ -30,7 +32,7 @@ questions = {
 
 
 def get_current_data(db: Database,
-                     chat_id: str) -> dict:
+                     chat_id: str) -> str | int | dict:
     data = db.get_data_list(
         get_prompt_view_current_info(chat_id)
     )[0]
@@ -76,7 +78,7 @@ def get_update_msg(game: dict,
     return get_question_ikb(
         quantity=len(questions[sport_type]),
         current_question_index=index,
-        coeffs=coeffs, answer=answer,
+        coeffs=len(coeffs), answer=answer,
         game_key=game['game_key']
     ), msg_text
 
@@ -145,22 +147,21 @@ async def answer(answer: int,
     user_chat_id = str(callback.message.chat.id)
     db = Database()
 
-    data, current_game = get_current_data(db, user_chat_id)
+    index, sport_type, current_game = get_current_data(db, user_chat_id)
 
     game_key = current_game['game_key']
-    index = data['index']
-    type_= data['type']
-
-    reply_markup, _ = get_update_msg(
-        game=current_game, answer=answer, index=index, type_= type_
-    )
 
     old_answer = db.get_data_list(
         get_prompt_view_answer(
             chat_id=user_chat_id, game_key=game_key
         )
     )
+
     prompts = []
+    prompts.append(
+        get_prompt_add_vote(game_key, answer)
+    )
+
     if old_answer:
         if old_answer[0]['answer'] == answer:
             return
@@ -180,6 +181,13 @@ async def answer(answer: int,
         
     db.action(*prompts)
     
+    reply_markup, _ = get_update_msg(
+        game=current_game, answer=answer, index=index, sport_type=sport_type
+    )
+
+    games_gs = Games()
+    games_gs.update_votes(answer, game_key)
+
     await callback.message.edit_reply_markup(reply_markup=reply_markup)
 
 
