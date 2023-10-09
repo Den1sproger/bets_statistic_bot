@@ -1,11 +1,13 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (ReplyKeyboardMarkup,
+                           KeyboardButton,
+                           InlineKeyboardMarkup,
+                           InlineKeyboardButton)
 
 
 main_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
-        [KeyboardButton('Голосование')],
-        [KeyboardButton('Моя команда')],
+        [KeyboardButton('Голосование'), KeyboardButton('Моя команда')],
         [KeyboardButton('Статистика')]
     ]
 )
