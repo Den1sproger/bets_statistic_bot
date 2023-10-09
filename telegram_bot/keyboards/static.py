@@ -28,6 +28,14 @@ team_create_ikb = InlineKeyboardMarkup(
 
 confirm_leave_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton('Подтвердить', callback_data='confirm_leave')]
+        [InlineKeyboardButton('Подтвердить', callback_data='confirm_leave')],
+        [InlineKeyboardButton('Отмена', callback_data='not_confirm')]
+    ]
+)
+
+confirm_delete_team_ikb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton('Подтвердить', callback_data='confirm_delete_team')],
+        [InlineKeyboardButton('Отмена', callback_data='not_confirm')]
     ]
 )
