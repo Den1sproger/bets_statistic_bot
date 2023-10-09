@@ -24,6 +24,7 @@ CREATE TABLE users
     username varchar(32) NOT NULL,
     positive_bets int NOT NULL,
     negative_bets int NOT NULL,
+    coeff_sum float NOT NULL,
     roi float NOT NULL,
     team_name varchar(50),
 );
