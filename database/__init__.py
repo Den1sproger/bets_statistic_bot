@@ -3,6 +3,7 @@ from .db_work import Database
 
 SPORT_TYPES = ('Футбол', 'Хоккей', 'Баскетбол')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
+PROMPT_VIEW_USERNAMES = "SELECT username FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
 PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi FROM users WHERE username='poole';"
@@ -128,8 +129,35 @@ def get_prompt_view_username_by_id(chat_id: str) -> str:
     return f"SELECT username FROM users WHERE chat_id='{chat_id}';"
 
 
-def get_prompt_leave_team(chat_id: str) -> str:
-    return f"UPDATE users SET team_name=NULL WHERE chat_id='{chat_id}';"
+def get_prompt_view_chat_id_by_name(username: str) -> str:
+    return f"SELECT chat_id FROM users WHERE username='{username}';"
+
+
+def get_prompt_view_team_size(team_name: str) -> str:
+    return f"SELECT teammates FROM teams WHERE team_name='{team_name}';"
+
+
+def get_prompts_leave_team(chat_id: str,
+                           team_name: str) -> str:
+    return (
+        f"UPDATE users SET team_name=NULL WHERE chat_id='{chat_id}';",
+        f"UPDATE teams SET teammates=teammates=teammates-1 WHERE team_name='{team_name}'"
+    )
+
+
+def get_prompts_add_teammate(chat_id: str,
+                             team_name: str) -> str:
+    return (
+        f"UPDATE users SET team_name='{team_name}' WHERE chat_id='{chat_id}';",
+        f"UPDATE teams SET teammates=teammates+1 WHERE team_name='{team_name}'"
+    )
+
+
+def get_prompts_delete_team(team_name: str) -> list[str]:
+    return (
+        f"DELETE FROM teams WHERE team_name='{team_name}';",
+        f"UPDATE users SET team_name=NULL WHERE team_name='{team_name}';"
+    )
 
 
 
@@ -141,6 +169,7 @@ __all__ = [
     'PROMPT_VIEW_GAMES',
     'PROMPT_VIEW_POOLE_STAT',
     'PROMPT_VIEW_TEAMS',
+    'PROMPT_VIEW_USERNAMES',
     'get_prompt_add_vote',
     'get_prompts_add_user',
     'get_prompt_view_games',
@@ -164,5 +193,8 @@ __all__ = [
     'get_prompt_view_captain',
     'get_prompt_create_team',
     'get_prompt_leave_team',
-    'get_prompt_view_username_by_id'
+    'get_prompt_add_teammate',
+    'get_prompt_view_username_by_id',
+    'get_prompt_view_chat_id_by_name',
+    'get_prompt_view_team_size'
 ]
