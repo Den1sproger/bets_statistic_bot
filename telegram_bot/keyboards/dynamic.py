@@ -1,7 +1,9 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import (Database,
                       get_prompt_view_votes,
-                      get_prompt_view_captain)
+                      get_prompt_view_captain,
+                      get_prompt_view_username_by_id,
+                      get_prompt_view_teammates)
 
 
 
@@ -54,6 +56,7 @@ def get_question_ikb(quantity: int,
                 InlineKeyboardButton(team_2, callback_data='second_team')
             ]
         ]
+
     inline_keyboard.append([
         InlineKeyboardButton('<', callback_data='previous_question'),
         InlineKeyboardButton(f'{current_question_index + 1}/{quantity}', callback_data='0'),
@@ -67,26 +70,39 @@ def get_question_ikb(quantity: int,
     return ikb
 
 
-def get_teammates_ikb(teammates: list,
-                      team_name: str,
+def get_teammates_ikb(team_name: str,
                       user_chat_id: str) -> None:
-    inline_keyboard = []
-    for user in teammates:
-        inline_keyboard.append([
-            InlineKeyboardButton(text=user['username'], callback_data=f"view_teammate_{user['chat_id']}")
-        ])
-
     db = Database()
+
     captain = db.get_data_list(
         get_prompt_view_captain(team_name)
     )[0]['captain_chat_id']
+    captain_nick =  db.get_data_list(
+        get_prompt_view_username_by_id(captain)
+    )[0]['username']
+
+    inline_keyboard = []
+    inline_keyboard.append([
+        InlineKeyboardButton(
+            text=f'{captain_nick} - капитан', callback_data=f'view_teammate_{captain}'
+        )
+    ])
+
+    teammates_no_captain = db.get_data_list(
+        get_prompt_view_teammates(team_name, captain)
+    )
+
+    for user in teammates_no_captain:
+        inline_keyboard.append([
+            InlineKeyboardButton(text=user['username'], callback_data=f"view_teammate_{user['chat_id']}")
+        ])
 
     if captain != user_chat_id:
         inline_keyboard.append(
             [InlineKeyboardButton('Выйти из команды', callback_data='leave_team')]
         )
     else:
-        inline_keyboard + [
+        inline_keyboard += [
             [InlineKeyboardButton('Добавить участника', callback_data='add_teammate')],
             [InlineKeyboardButton('Удалить команду', callback_data='delete_team')],
             [InlineKeyboardButton('Выйти из команды', callback_data='leave_team_admin')]

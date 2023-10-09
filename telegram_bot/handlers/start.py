@@ -4,13 +4,14 @@ from googlesheets import Stat_mass, Stat_sport_types
 from database import (Database,
                       get_prompts_add_user,
                       PROMPT_VIEW_ALL_CHAT_IDS)
+from ..assets import START_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import main_kb
 
 
 
 WELCOME = """
-Hello
+Привет, здесь ты можешь вести статистику своих ставок
 """
 
 HELP_TEXT = """
@@ -22,6 +23,7 @@ HELP_TEXT = """
 """
 
 
+
 @dp.message_handler(Command('start'))
 async def start(message: types.Message) -> None:
     user_chat_id = str(message.chat.id)
@@ -31,8 +33,8 @@ async def start(message: types.Message) -> None:
 
     db = Database()
     users = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_ALL_CHAT_IDS)]
-
-    if not user_chat_id in users:
+    
+    if user_chat_id not in users:
         db.action(*get_prompts_add_user(username, user_chat_id))
 
     # add user to main sheet
@@ -43,7 +45,10 @@ async def start(message: types.Message) -> None:
     sst = Stat_sport_types()
     sst.add_user(user_chat_id)
 
-    await message.answer(WELCOME, reply_markup=main_kb)
+    with open(START_PHOTO_PATH, 'rb') as file:
+        await message.answer_photo(photo=types.InputFile(file),
+                                   caption=WELCOME,
+                                   reply_markup=main_kb)
 
 
 @dp.message_handler(Command('help'))

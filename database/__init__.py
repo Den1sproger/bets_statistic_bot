@@ -1,7 +1,7 @@
 from .db_work import Database
 
 
-SPORT_TYPES = ('SOCCER', 'HOCKEY', 'BASKETBALL')
+SPORT_TYPES = ('Футбол', 'Хоккей', 'Баскетбол')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
@@ -21,9 +21,9 @@ def get_prompt_add_vote(game_key: str,
 
 
 def get_prompts_add_user(username: str,
-                        chat_id: str) -> list[str]:
-    prompts = [f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, roi)" \
-            f"VALUES ('{username}', '{chat_id}', 0, 0, 0);"]
+                         chat_id: str) -> list[str]:
+    prompts = [f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, coeff_sum, roi)" \
+               f"VALUES ('{username}', '{chat_id}', 0, 0, 0, 0);"]
     for sport_type in SPORT_TYPES:
         prompts.append(f"INSERT INTO currents_users_roi (chat_id, sport_type, positive_bets, negative_bets, roi)" \
                        f"VALUES ('{chat_id}', '{sport_type}', 0, 0, 0);")
@@ -106,8 +106,9 @@ def get_prompt_view_team_stat(team_name: str) -> str:
     return f"SELECT positive_bets, negative_bets, roi FROM teams WHERE team_name='{team_name}';"
 
 
-def get_prompt_view_teammates(team_name: str) -> str:
-    return f"SELECT * FROM users WHERE team_name='{team_name}';"
+def get_prompt_view_teammates(team_name: str,
+                              captain_chat_id: str) -> str:
+    return f"SELECT * FROM users WHERE team_name='{team_name}' AND chat_id <> '{captain_chat_id}';"
 
 
 def get_prompt_view_captain(team_name: str) -> str:
@@ -116,11 +117,15 @@ def get_prompt_view_captain(team_name: str) -> str:
 
 def get_prompt_create_team(team_name: str,
                            captain: str) -> list[str]:
-    return [
-        "INSERT INTO teams (team_name, captain_chat_id, positive bets, negative_bets, roi)" \
-        f"VALUES ('{team_name}', '{captain}', 0, 0, 0);",
+    return (
+        f"INSERT INTO teams (team_name, captain_chat_id, positive_bets, negative_bets, roi, teammates)" \
+        f"VALUES ('{team_name}', '{captain}', 0, 0, 0, 1);",
         f"UPDATE users SET team_name='{team_name}' WHERE chat_id='{captain}';"
-    ]
+    )
+
+
+def get_prompt_view_username_by_id(chat_id: str) -> str:
+    return f"SELECT username FROM users WHERE chat_id='{chat_id}';"
 
 
 def get_prompt_leave_team(chat_id: str) -> str:
@@ -158,5 +163,6 @@ __all__ = [
     'get_prompt_view_teammates',
     'get_prompt_view_captain',
     'get_prompt_create_team',
-    'get_prompt_leave_team'
+    'get_prompt_leave_team',
+    'get_prompt_view_username_by_id'
 ]

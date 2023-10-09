@@ -4,8 +4,8 @@ from database import (Database,
                       get_prompt_view_user_stat,
                       get_prompt_view_user_team,
                       get_prompt_view_team_stat,
-                      get_prompt_view_teammates,
                       PROMPT_VIEW_POOLE_STAT)
+from ..assets import VOTING_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import (sport_types_ikb,
                          team_create_ikb,
@@ -16,7 +16,10 @@ from ..keyboards import (sport_types_ikb,
 @dp.message_handler(Text(equals='Голосование'))
 @dp.message_handler(Command('voting'))
 async def voting(message: types.Message) -> None:
-    await message.answer('Выберите вид спорта', reply_markup=sport_types_ikb)
+    with open(VOTING_PHOTO_PATH, 'rb') as file:
+        await message.answer_photo(photo=types.InputFile(file),
+                                   caption='Выберите вид спорта',
+                                   reply_markup=sport_types_ikb)
 
 
 
@@ -29,24 +32,20 @@ async def my_team(message: types.Message) -> None:
     user_team = db.get_data_list(
         get_prompt_view_user_team(user_chat_id)
     )[0]['team_name']
-    if user_team:
-        teammates = db.get_data_list(
-            get_prompt_view_teammates(team_name=user_team)
-        )
-        teammates = [i['username'] for i in teammates]
 
+    if user_team:
         await message.answer(
-            text='Список команды:',
+            text=f'{user_team}\nСписок команды:',
             reply_markup=get_teammates_ikb(
-                teammates=teammates, user_chat_id=user_chat_id,
-                team_name=user_team
+                user_chat_id=user_chat_id, team_name=user_team
             )
         )
-    else:
-        await message.answer(
-            text='Вы не состоите в команде, можете создать команду и вы будете капитаном команды',
-            reply_markup=team_create_ikb
-        )
+        return
+    
+    await message.answer(
+        text='Вы не состоите в команде, можете создать команду и вы будете капитаном команды',
+        reply_markup=team_create_ikb
+    )
 
 
 

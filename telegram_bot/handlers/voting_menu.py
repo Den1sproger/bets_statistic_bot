@@ -1,6 +1,7 @@
 from aiogram import types
 from ..bot_config import dp
 from ..keyboards import sport_types_ikb, get_question_ikb
+from ..assets import VOTING_PHOTO_PATH
 from googlesheets import Games
 from database import (Database,
                       get_prompt_view_games,
@@ -19,7 +20,7 @@ from database import (Database,
 
 
 sport_symbols = {
-    'ФУТБОЛ': ' ⚽️⚽️⚽️',
+    'ФУТБОЛ': '⚽️⚽️⚽️',
     'ХОККЕЙ': '🏒🏒🏒',
     'БАСКЕТБОЛ': '🏀🏀🏀'
 }
@@ -85,7 +86,8 @@ def get_update_msg(game: dict,
 
 
 # update data of question for the message and edit the message
-async def update_questions_data(callback: types.CallbackQuery) -> None:
+async def update_questions_data(callback: types.CallbackQuery,
+                                edit: bool = True) -> None:
     user_chat_id = str(callback.message.chat.id)
     db = Database()
     current_index, sport_type, current_game = get_current_data(db, user_chat_id)
@@ -96,22 +98,24 @@ async def update_questions_data(callback: types.CallbackQuery) -> None:
             game_key=current_game['game_key']
         )
     )
-    if answer:
-        answer = answer[0]['answer']
-    else:
-        answer = None
+    if answer: answer = answer[0]['answer']
+    else: answer = None
         
     reply_markup, msg_text = get_update_msg(
         game=current_game, answer=answer,
         index=current_index, sport_type=sport_type
     )
     
-    await callback.message.edit_text(msg_text)
-    await callback.message.edit_reply_markup(reply_markup=reply_markup)
+    if edit:
+        await callback.message.edit_text(msg_text)
+        await callback.message.edit_reply_markup(reply_markup=reply_markup)
+    else:
+        await callback.message.delete()
+        await callback.message.answer(msg_text, reply_markup=reply_markup)
 
 
 
-# selected sport type for voting
+# click on sport type button for voting
 @dp.callback_query_handler(lambda callback: callback.data.startswith('voting_'))
 async def get_voting_board(callback: types.CallbackQuery) -> None:
     sport_type = callback.data.replace('voting_', '')
@@ -135,7 +139,7 @@ async def get_voting_board(callback: types.CallbackQuery) -> None:
             db.action(
                 get_prompt_update_current_index(user_chat_id)
             )
-        await update_questions_data(callback)
+        await update_questions_data(callback, edit=False)
 
     else:
         await callback.answer('В данный момент голосование недоступно')
@@ -192,7 +196,7 @@ async def answer(answer: int,
 
 
 
-# next question
+# click on arrow of next question
 @dp.callback_query_handler(lambda callback: callback.data == 'next_question')
 async def next_question(callback: types.CallbackQuery) -> None:
     user_chat_id = str(callback.message.chat.id)
@@ -202,7 +206,7 @@ async def next_question(callback: types.CallbackQuery) -> None:
     await update_questions_data(callback)
 
 
-# previous question
+# click on arrow of previous question
 @dp.callback_query_handler(lambda callback: callback.data == 'previous_question')
 async def previous_question(callback: types.CallbackQuery) -> None:
     user_chat_id = str(callback.message.chat.id)
@@ -213,30 +217,33 @@ async def previous_question(callback: types.CallbackQuery) -> None:
 
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'first_team')
+@dp.callback_query_handler(lambda callback: callback.data == 'first_team')         # click on the first team button
 async def first_team(callback: types.CallbackQuery) -> None:
     await answer(answer=1, callback=callback)
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'second_team')
+@dp.callback_query_handler(lambda callback: callback.data == 'second_team')        # click on the second team button
 async def second_team(callback: types.CallbackQuery) -> None:
     await answer(answer=2, callback=callback)
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'draw')
+@dp.callback_query_handler(lambda callback: callback.data == 'draw')               # click on the draw button
 async def draw(callback: types.CallbackQuery) -> None:
     await answer(answer=3, callback=callback)
 
 
-# come back to the menu of sport_types
+# click the button of come back to the menu of sport_types
 @dp.callback_query_handler(lambda callback: callback.data == 'back_to_sport_types')
 async def back_to_tourns(callback: types.CallbackQuery) -> None:
     user_chat_id = str(callback.message.chat.id)
     db = Database()
-
     db.action(
         get_prompt_delete_current_info(user_chat_id)
     )
 
-    await callback.message.edit_text('Выберите вид спорта')
-    await callback.message.edit_reply_markup(reply_markup=sport_types_ikb)
+    await callback.message.delete()
+
+    with open(VOTING_PHOTO_PATH, 'rb') as file:
+        await callback.message.answer_photo(photo=types.InputFile(file),
+                                   caption='Выберите вид спорта',
+                                   reply_markup=sport_types_ikb)
