@@ -1,3 +1,4 @@
+from datetime import datetime
 from aiogram import types
 from ..bot_config import dp
 from ..keyboards import sport_types_ikb, get_question_ikb
@@ -15,7 +16,8 @@ from database import (Database,
                       get_prompt_increase_current_index,
                       get_prompt_decrease_current_index,
                       get_prompt_delete_current_info,
-                      get_prompt_add_vote)
+                      get_prompt_add_vote,
+                      get_prompt_update_game_status)
 
 
 
@@ -125,24 +127,45 @@ async def get_voting_board(callback: types.CallbackQuery) -> None:
 
     global questions
 
-    if games:
-        if games != questions[sport_type]:
-            questions[sport_type] = games
-
-        user_chat_id = str(callback.message.chat.id)
-        chat_ids = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_CURRENT_CHAT_iDS)]
-        if user_chat_id not in chat_ids:
-            db.action(
-                get_prompt_add_current_info(user_chat_id, sport_type)
-            )
-        else:
-            db.action(
-                get_prompt_update_current_index(user_chat_id)
-            )
-        await update_questions_data(callback, edit=False)
-
-    else:
+    if not games:
         await callback.answer('В данный момент голосование недоступно')
+        return
+
+    # check games on the begin
+    prompts = []
+    games_for_del = []
+    time_now = datetime.now()
+
+    for game in games:
+        game_begin_time = datetime.strptime(game['begin_time'], '%Y-%m-%d %H:%M')
+        if time_now >= game_begin_time:
+            prompts.append(
+                get_prompt_update_game_status(game['game_key'], status=2)
+            )
+            games_for_del.append(game)
+
+    if prompts: db.action(*prompts)            # update statuses in database
+    for game in games_for_del: games.remove(game)       # delete started games from current list
+    
+    # if all games is already start
+    if not games:
+        await callback.answer('Голосование недоступно')
+        return
+
+    if games != questions[sport_type]:
+        questions[sport_type] = games
+
+    user_chat_id = str(callback.message.chat.id)
+    chat_ids = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_CURRENT_CHAT_iDS)]
+    if user_chat_id not in chat_ids:
+        db.action(
+            get_prompt_add_current_info(user_chat_id, sport_type)
+        )
+    else:
+        db.action(
+            get_prompt_update_current_index(user_chat_id)
+        )
+    await update_questions_data(callback, edit=False)
 
 
     
@@ -245,5 +268,5 @@ async def back_to_tourns(callback: types.CallbackQuery) -> None:
 
     with open(VOTING_PHOTO_PATH, 'rb') as file:
         await callback.message.answer_photo(photo=types.InputFile(file),
-                                   caption='Выберите вид спорта',
-                                   reply_markup=sport_types_ikb)
+                                            caption='Выберите вид спорта',
+                                            reply_markup=sport_types_ikb)

@@ -170,6 +170,11 @@ def get_prompts_delete_team(team_name: str) -> list[str]:
     )
 
 
+def get_prompt_update_game_status(game_key: str,
+                                  status: int) -> str:
+    return f"UPDATE games SET game_status={status} WHERE game_key='{game_key}';"
+
+
 
 __all__ = [
     'Database',
@@ -209,5 +214,6 @@ __all__ = [
     'get_prompt_view_username_by_id',
     'get_prompt_view_chat_id_by_name',
     'get_prompt_view_chat_id_by_nick',
-    'get_prompt_view_team_size'
+    'get_prompt_view_team_size',
+    'get_prompt_update_game_status'
 ]
