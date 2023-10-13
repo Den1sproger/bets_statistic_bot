@@ -3,12 +3,18 @@ from .db_work import Database
 
 SPORT_TYPES = ('Футбол', 'Хоккей', 'Баскетбол')
 PROMPT_VIEW_ALL_CHAT_IDS = "SELECT chat_id FROM users;"
+PROMPT_VIEW_NICKNAMES = "SELECT nickname FROM users;"
 PROMPT_VIEW_USERNAMES = "SELECT username FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
 PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi FROM users WHERE username='poole';"
 PROMPT_VIEW_TEAMS = "SELECT team_name FROM teams;"
 
+
+
+def get_prompt_update_nickname(chat_id: str | int,
+                               new_nick: str) -> str:
+    return f"UPDATE users SET nickname='{new_nick}' WHERE chat_id='{chat_id}';"
 
 
 def get_prompt_add_vote(game_key: str,
@@ -133,6 +139,10 @@ def get_prompt_view_chat_id_by_name(username: str) -> str:
     return f"SELECT chat_id FROM users WHERE username='{username}';"
 
 
+def get_prompt_view_chat_id_by_nick(nickname: str) -> str:
+    return f"SELECT chat_id FROM users WHERE nickname='{nickname}';"
+
+
 def get_prompt_view_team_size(team_name: str) -> str:
     return f"SELECT teammates FROM teams WHERE team_name='{team_name}';"
 
@@ -164,12 +174,14 @@ def get_prompts_delete_team(team_name: str) -> list[str]:
 __all__ = [
     'Database',
     'SPORT_TYPES',
+    'PROMPT_VIEW_NICKNAMES',
     'PROMPT_VIEW_ALL_CHAT_IDS',
     'PROMPT_VIEW_CURRENT_CHAT_iDS',
     'PROMPT_VIEW_GAMES',
     'PROMPT_VIEW_POOLE_STAT',
     'PROMPT_VIEW_TEAMS',
     'PROMPT_VIEW_USERNAMES',
+    'get_prompt_update_nickname',
     'get_prompt_add_vote',
     'get_prompts_add_user',
     'get_prompt_view_games',
@@ -196,5 +208,6 @@ __all__ = [
     'get_prompt_add_teammate',
     'get_prompt_view_username_by_id',
     'get_prompt_view_chat_id_by_name',
+    'get_prompt_view_chat_id_by_nick',
     'get_prompt_view_team_size'
 ]

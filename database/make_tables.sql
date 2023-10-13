@@ -22,14 +22,15 @@ CREATE TABLE users
     id serial PRIMARY KEY,
     chat_id varchar(50),
     username varchar(32) NOT NULL,
+    nickname varchar(255),
     positive_bets int NOT NULL,
     negative_bets int NOT NULL,
     coeff_sum float NOT NULL,
     roi float NOT NULL,
-    team_name varchar(50),
+    team_name varchar(50)
 );
 -- adding data to the table immediately after creation
-INSERT INTO users (username, positive_bets, negative_bets, roi) VALUES ('poole', 0, 0, 0)
+INSERT INTO users (username, positive_bets, negative_bets, coeff_sum, roi) VALUES ('poole', 0, 0, 0, 0)
 
 
 CREATE TABLE positive_votes_poole

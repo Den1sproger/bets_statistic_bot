@@ -34,9 +34,11 @@ class Stat_mass(Connect):
     CELLS_COLS = {
         "chat_id": "A",
         "username": "B",
-        "positive_bets": "C",
-        "negative_bets": "D",
-        "roi": "E"
+        "nickname": "C",
+        "positive_bets": "D",
+        "negative_bets": "E",
+        "roi": "F",
+        "coeff_sum": "G"
     }
     SHEET_NAME = "Статы массовые"
 
@@ -46,16 +48,14 @@ class Stat_mass(Connect):
         self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
     
 
-    def add_user(self,
-                 chat_id: str,
-                 username: str) -> None:
+    def add_user(self, chat_id: str, username: str, nickname: str) -> None:
         # add user in table
         chat_ids = self.worksheet.col_values(1)
         if chat_id not in chat_ids:
             row = len(chat_ids) + 1
             self.worksheet.update(
                 f'{self.CELLS_COLS["chat_id"]}{row}',
-                [[chat_id, username, 0, 0, 0]]
+                [[chat_id, username, nickname, 0, 0, 0, 0]]
             )
 
 

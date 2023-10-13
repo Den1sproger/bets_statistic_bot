@@ -1,6 +1,5 @@
-from .bot_config import dp, bot, set_default_commands
+from .bot_config import dp, bot
 
 __all__ = [
-    'dp', 'bot', 
-    'set_default_commands'
+    'dp', 'bot'
 ]

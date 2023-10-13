@@ -14,13 +14,10 @@ bot = Bot(TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 
-async def set_default_commands(dp: Dispatcher) -> None:
-    await dp.bot.set_my_commands(
-        [
-            BotCommand('start', 'Запустить бота'),
-            BotCommand('help', 'Помощь'),
-            BotCommand('voting', 'Голосование'),
-            BotCommand('myteam', 'Моя команда'),
-            BotCommand('statistics', 'Статистика')
-        ]
-    )
+default_commands = [
+    BotCommand('start', 'Запустить бота'),
+    BotCommand('help', 'Помощь'),
+    BotCommand('voting', 'Голосование'),
+    BotCommand('myteam', 'Моя команда'),
+    BotCommand('statistics', 'Статистика')
+]
