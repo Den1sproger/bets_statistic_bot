@@ -3,7 +3,8 @@ from database import (Database,
                       get_prompt_view_votes,
                       get_prompt_view_captain,
                       get_prompt_view_username_by_id,
-                      get_prompt_view_teammates)
+                      get_prompt_view_teammates,
+                      get_prompt_view_user_team)
 
 
 
@@ -105,16 +106,31 @@ def get_teammates_ikb(team_name: str,
         inline_keyboard += [
             [InlineKeyboardButton('Добавить участника', callback_data=f'add_teammate_{team_name}')],
             [InlineKeyboardButton('Удалить команду', callback_data='delete_team')],
-            [InlineKeyboardButton('Выйти из команды', callback_data='leave_team_admin')]
         ]
         
     ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return ikb
 
 
-def get_teammate_ikb(chat_id: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton('Удалить участника', callback_data=f"delete_teammate_{chat_id}")]
-        ]
+def get_teammate_ikb(teammate_chat_id: str) -> InlineKeyboardMarkup:
+    inline_keyboard=[]
+
+    db = Database()
+    team_name = db.get_data_list(
+        get_prompt_view_user_team(teammate_chat_id)
+    )[0]['team_name']
+
+    captain_chat_id = db.get_data_list(
+        get_prompt_view_captain(team_name)
+    )[0]['captain_chat_id']
+
+    if teammate_chat_id != captain_chat_id:
+        inline_keyboard.append(
+            [InlineKeyboardButton('Удалить участника', callback_data=f"delete_teammate_{teammate_chat_id}")]
+        )
+            
+    inline_keyboard.append(
+        [InlineKeyboardButton('Вернуться к участникам', callback_data=f"back_to_teammates_{team_name}")]
     )
+
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

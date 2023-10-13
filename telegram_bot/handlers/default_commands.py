@@ -58,8 +58,8 @@ async def statistics(message: types.Message) -> None:
     # user statistics
     user_stat = db.get_data_list(
         get_prompt_view_user_stat(user_chat_id)
-    )
-    user_roi = user_stat[0]['roi']
+    )[0]
+    user_roi = user_stat['roi']
     if user_roi > 0:
         user_roi = f'+{user_roi}'
 
@@ -70,7 +70,7 @@ async def statistics(message: types.Message) -> None:
     if user_team:
         team_stat = db.get_data_list(
             get_prompt_view_team_stat(user_team)
-        )
+        )[0]
         team_positive = team_stat['positive_bets']
         team_negative = team_stat['negative_bets']
         team_roi = team_stat['roi']
@@ -82,15 +82,15 @@ async def statistics(message: types.Message) -> None:
         team_roi = 0
 
     # poole statistics
-    poole_stat = db.get_data_list(PROMPT_VIEW_POOLE_STAT)
-    poole_roi = poole_stat[0]['roi']
+    poole_stat = db.get_data_list(PROMPT_VIEW_POOLE_STAT)[0]
+    poole_roi = poole_stat['roi']
     if poole_roi > 0:
         poole_roi = f'+{poole_roi}'
 
     # message
-    statistics_text = "**СТАТИСТИКА**\n" \
-        f"Стат мой:\t\t✅{user_stat['positive_bets']}\t❌{user_stat['negative_bets']}\tROI {user_roi}\n" \
-        f"Стат команды:\t✅{team_positive}\t❌{team_negative}\tROI {team_roi}\n" \
-        f"Стат пула:&nbsp;&nbsp;&nbsp;\t✅{poole_stat['positive_bets']}\t❌{poole_stat['negative_bets']}\tROI {poole_roi}\n"
+    statistics_text = "<b>СТАТИСТИКА</b>\n" \
+        f"Стат мой:✅{user_stat['positive_bets']}\t❌{user_stat['negative_bets']}\tROI {user_roi}\n" \
+        f"Стат команды:✅{team_positive}\t❌{team_negative}\tROI {team_roi}\n" \
+        f"Стат пула:✅{poole_stat['positive_bets']}\t❌{poole_stat['negative_bets']}\tROI {poole_roi}\n"
     
-    await message.answer(statistics_text, parse_mode='Markdown')
+    await message.answer(statistics_text, parse_mode='HTML')
