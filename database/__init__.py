@@ -17,14 +17,15 @@ def get_prompt_update_nickname(chat_id: str | int,
     return f"UPDATE users SET nickname='{new_nick}' WHERE chat_id='{chat_id}';"
 
 
-def get_prompt_add_vote(game_key: str,
-                        answer: int) -> str:
+def get_prompt_update_vote(game_key: str,
+                           answer: int,
+                           action: str) -> str:
     teams = {
         1: 'poole_first',
         2: 'poole_second',
         3: 'poole_draw'
     }
-    return f"UPDATE games SET {teams[answer]}={teams[answer]}+1 WHERE game_key='{game_key}';"
+    return f"UPDATE games SET {teams[answer]}={teams[answer]}{action}1 WHERE game_key='{game_key}';"
 
 
 def get_prompts_add_user(username: str,
@@ -68,6 +69,12 @@ def get_prompt_delete_current_info(chat_id: str) -> str:
     return f"DELETE FROM current_questions WHERE chat_id='{chat_id}';"
 
 
+def get_prompt_update_current_info(chat_id: str,
+                                   sport_type: str,
+                                   new_index: int = 0) -> str:
+    return f"UPDATE current_questions SET current_index={new_index}, sport_type='{sport_type}' WHERE chat_id='{chat_id}';"
+
+
 def get_prompt_add_answer(chat_id: str,
                           answer: int,
                           game_key: str) -> str:
@@ -95,10 +102,6 @@ def get_prompt_increase_current_index(chat_id: str) -> str:
 
 def get_prompt_decrease_current_index(chat_id: str)-> str:
     return f"UPDATE current_questions SET current_index=current_index-1 WHERE chat_id='{chat_id}';"
-
-
-def get_prompt_delete_current_info(chat_id: str) -> str:
-    return f"DELETE FROM current_questions WHERE chat_id='{chat_id}';"
 
 
 def get_prompt_view_user_stat(chat_id: str) -> str:
@@ -187,7 +190,7 @@ __all__ = [
     'PROMPT_VIEW_TEAMS',
     'PROMPT_VIEW_USERNAMES',
     'get_prompt_update_nickname',
-    'get_prompt_add_vote',
+    'get_prompt_update_vote',
     'get_prompts_add_user',
     'get_prompt_view_games',
     'get_prompt_view_current_info',
@@ -196,13 +199,13 @@ __all__ = [
     'get_prompt_add_current_info',
     'get_prompt_update_current_index',
     'get_prompt_delete_current_info',
+    'get_prompt_update_current_info',
     'get_prompt_add_answer',
     'get_prompt_view_answer',
     'get_prompt_update_answer',
     'get_prompt_view_votes',
     'get_prompt_increase_current_index',
     'get_prompt_decrease_current_index',
-    'get_prompt_delete_current_info',
     'get_prompt_view_user_stat',
     'get_prompt_view_user_team',
     'get_prompt_view_team_stat',

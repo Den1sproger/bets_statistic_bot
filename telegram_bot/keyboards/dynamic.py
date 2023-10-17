@@ -14,11 +14,7 @@ def get_question_ikb(quantity: int,
                      answer: int = None,
                      game_key: str = None) -> InlineKeyboardMarkup:
     # keyboard for the one question
-    if not answer:
-        team_1 = 'П1'
-        team_2 = 'П2'
-        draw = 'X'
-    else:
+    if answer:
         db = Database()
         votes_data = db.get_data_list(get_prompt_view_votes(game_key))[0]
 
@@ -41,6 +37,11 @@ def get_question_ikb(quantity: int,
         if answer == 1: team_1 = f"👉{team_1}👈"
         elif answer == 2: team_2 = f"👉{team_2}👈"
         else: draw = f"👉{draw}👈"
+
+    else:
+        team_1 = 'П1'
+        team_2 = 'П2'
+        draw = 'X'
 
     if coeffs == 3:
         inline_keyboard = [

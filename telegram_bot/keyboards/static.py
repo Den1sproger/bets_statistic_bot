@@ -16,7 +16,7 @@ sport_types_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton('ФУТБОЛ', callback_data='voting_Футбол')],
         [InlineKeyboardButton('ХОККЕЙ', callback_data='voting_Хоккей')],
-        [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_Баскетболл')]
+        [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_Баскетбол')]
     ]
 )
 

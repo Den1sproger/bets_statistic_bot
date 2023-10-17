@@ -125,6 +125,7 @@ class Stat_sport_types(Connect):
     #     self.worksheet.batch_update(update_data)
 
 
+
 class Games(Connect):
     """"""
 
@@ -145,31 +146,23 @@ class Games(Connect):
         self.worksheet = self.spreadsheet.worksheet(self.SHEET_NAME)
 
 
-    def update_votes(self, answer: int, game_key: str) -> None:
+    def update_votes(self, game_key: str) -> None:
         # update votes in te last column for the one team
         db = Database()
         games = db.get_data_list(PROMPT_VIEW_GAMES)
 
-        count = 1
-        votes: int
+        count = 2
+        votes = []
 
         for game in games:
-            teams = [game['first_team'], game['second_team']]
-            draw = game['draw_coeff']
-            if draw:
-                teams.append(draw)
+            teams = [[game['poole_first']], [game['poole_second']]]
+            draw = game['poole_draw']
+            if draw != None: teams.append([draw])
 
             if game['game_key'] == game_key:
-                
-                for team, db_key in zip(teams, ('poole_first', 'poole_second', 'poole_draw')):
-                    count += 1
-
-                    team_number = teams.index(team) + 1
-                    if (team_number == answer):
-                        votes = game[db_key]
-                        break
-
+                votes = teams
                 break
+            
             count += len(teams)
             
         self.worksheet.update(f"{self.CELLS_COLS['poole']}{count}", votes)

@@ -16,7 +16,8 @@ from database import (Database,
                       get_prompt_increase_current_index,
                       get_prompt_decrease_current_index,
                       get_prompt_delete_current_info,
-                      get_prompt_add_vote,
+                      get_prompt_update_current_info,
+                      get_prompt_update_vote,
                       get_prompt_update_game_status)
 
 
@@ -50,7 +51,7 @@ def get_current_data(db: Database,
     elif current_index >= games_number:
         current_index = 0
         db.action(get_prompt_update_current_index(chat_id, current_index))
-
+    
     current_game = questions[sport_type][current_index]
 
     return current_index, sport_type, current_game
@@ -121,7 +122,7 @@ async def update_questions_data(callback: types.CallbackQuery,
 @dp.callback_query_handler(lambda callback: callback.data.startswith('voting_'))
 async def get_voting_board(callback: types.CallbackQuery) -> None:
     sport_type = callback.data.replace('voting_', '')
-    
+
     db = Database()
     games = db.get_data_list(get_prompt_view_games(sport_type))
 
@@ -157,13 +158,14 @@ async def get_voting_board(callback: types.CallbackQuery) -> None:
 
     user_chat_id = str(callback.message.chat.id)
     chat_ids = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_CURRENT_CHAT_iDS)]
+    
     if user_chat_id not in chat_ids:
         db.action(
             get_prompt_add_current_info(user_chat_id, sport_type)
         )
     else:
         db.action(
-            get_prompt_update_current_index(user_chat_id)
+            get_prompt_update_current_info(user_chat_id, sport_type)
         )
     await update_questions_data(callback, edit=False)
 
@@ -186,7 +188,7 @@ async def answer(answer: int,
 
     prompts = []
     prompts.append(
-        get_prompt_add_vote(game_key, answer)
+        get_prompt_update_vote(game_key, answer, action='+')
     )
 
     if old_answer:
@@ -197,6 +199,9 @@ async def answer(answer: int,
                 chat_id=user_chat_id,
                 game_key=game_key, new_answer=answer
             )
+        )
+        prompts.append(
+            get_prompt_update_vote(game_key, old_answer[0]['answer'], action='-')
         )
     else:
         prompts.append(
@@ -213,7 +218,7 @@ async def answer(answer: int,
     )
 
     games_gs = Games()
-    games_gs.update_votes(answer, game_key)
+    games_gs.update_votes(game_key)
 
     await callback.message.edit_reply_markup(reply_markup=reply_markup)
 
