@@ -41,7 +41,8 @@ async def start(message: types.Message) -> None:
     users = [i['chat_id'] for i in db.get_data_list(PROMPT_VIEW_ALL_CHAT_IDS)]
     
     if user_chat_id not in users:
-        db.action(*get_prompts_add_user(username, user_chat_id))
+        prompts = get_prompts_add_user(username, user_chat_id)
+        db.action(*prompts)
         await _ProfileStatesGroup.get_start_nickname.set()
 
         with open(START_PHOTO_PATH, 'rb') as file:
