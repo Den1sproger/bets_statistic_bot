@@ -10,7 +10,9 @@ from database import (Database,
                       get_prompt_view_user_team,
                       get_prompts_add_teammate,
                       get_prompt_view_team_size,
-                      get_prompts_delete_team)
+                      get_prompts_delete_team,
+                      get_prompt_view_captain,
+                      get_prompt_view_nickname_by_id)
 from .config import _ProfileStatesGroup
 from ..bot_config import dp, bot
 from ..keyboards import (confirm_leave_ikb,
@@ -56,7 +58,6 @@ async def get_team_name(message: types.Message,
 @dp.callback_query_handler(lambda callback: callback.data.startswith('view_teammate_'))
 async def view_teammate(callback: types.CallbackQuery) -> None:
     teammate_chat_id = callback.data.replace('view_teammate_', '')
-    print(teammate_chat_id)
 
     await callback.message.edit_text(
         text=f'<a href="tg://user?id={teammate_chat_id}">Участник</a>',
@@ -182,12 +183,24 @@ async def confirm_leave(callback: types.CallbackQuery) -> None:
         get_prompt_view_user_team(user_chat_id)
     )[0]['team_name']
 
+    captain_chat_id = db.get_data_list(
+        get_prompt_view_captain(team_name)
+    )[0]['captain_chat_id']
+
+    nickname = db.get_data_list(
+        get_prompt_view_nickname_by_id(user_chat_id)
+    )[0]['nickname']
+
     db.action(
         *get_prompts_leave_team(user_chat_id, team_name)
     )
 
     await callback.message.delete()
     await callback.message.answer('Вы покинули команду')
+    await bot.send_message(
+        chat_id=captain_chat_id,
+        text=f'{nickname} покинул команду'
+    )
 
 
 
