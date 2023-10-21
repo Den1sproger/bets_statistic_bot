@@ -19,5 +19,6 @@ default_commands = [
     BotCommand('help', 'Помощь'),
     BotCommand('voting', 'Голосование'),
     BotCommand('myteam', 'Моя команда'),
-    BotCommand('statistics', 'Статистика')
+    BotCommand('statistics', 'Статистика'),
+    BotCommand('change_nick', 'Изменить ник')
 ]
