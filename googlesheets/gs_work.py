@@ -4,12 +4,8 @@ import gspread
 
 from database import (Database,
                       PROMPT_VIEW_GAMES,
-                      SPORT_TYPES,
-                      get_prompt_view_votes)
-from .config import (SPREADSHEET_ID,
-                     CREDENTIALS,
-                     STAT_MASS_SPREADSHEET_URL,
-                     STAT_SPORTS_SPREADSHEET_URL)
+                      SPORT_TYPES)
+from .config import SPREADSHEET_ID, CREDENTIALS
 
 
 
@@ -58,6 +54,11 @@ class Stat_mass(Connect):
                 [[chat_id, username, nickname, 0, 0, 0, 0]]
             )
 
+    
+    def update_nickname(self, new_nick: str, old_nick: str) -> None:
+        cell = self.worksheet.find(old_nick, in_column=3)
+        self.worksheet.update_cell(row=cell.row, col=3, value=new_nick)
+
 
 
 class Stat_sport_types(Connect):
@@ -86,9 +87,9 @@ class Stat_sport_types(Connect):
                      sport_type: str) -> str:
         assert sport_type in SPORT_TYPES, 'Unknown sport type'
 
-        if sport_type == 'SOCCER':
+        if sport_type == 'Футбол':
             return self.CELLS_COLS[column]
-        elif sport_type == 'HOCKEY':
+        elif sport_type == 'Хоккей':
             return self.cells[self.cells.index(self.CELLS_COLS[column]) + self.OFFSET]
         else:
             return self.cells[self.cells.index(self.CELLS_COLS[column]) + self.OFFSET * 2]
