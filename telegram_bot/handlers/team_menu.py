@@ -17,6 +17,7 @@ from .config import _ProfileStatesGroup
 from ..bot_config import dp, bot
 from ..keyboards import (confirm_leave_ikb,
                          confirm_delete_team_ikb,
+                         get_invitation_to_team_ikb,
                          get_teammate_ikb,
                          get_teammates_ikb)
 
@@ -85,7 +86,10 @@ async def delete_teammate(callback: types.CallbackQuery) -> None:
     
     await callback.message.delete()
     await callback.message.answer('Участник удален')
-
+    await bot.send_message(
+        chat_id=user_chat_id,
+        text=f"Вы были удалены из команды {team_name}"
+    )
 
 
 
@@ -150,6 +154,8 @@ async def get_team_name(message: types.Message, state=FSMContext) -> None:
         await state.finish()
         return
     
+    await state.finish()
+    
     captain_chat_id = str(message.chat.id)
     team_name = db.get_data_list(
         get_prompt_view_user_team(captain_chat_id)
@@ -159,9 +165,53 @@ async def get_team_name(message: types.Message, state=FSMContext) -> None:
     )
 
     await state.finish()
-    await bot.send_message(user_chat_id, f'Вы были добавлены в команду {team_name}')
-    await message.answer(f'Пользователь {input_nickname} добавлен')
+    await bot.send_message(
+        chat_id=user_chat_id,
+        text=f'Вас хотят пригласить в команду {team_name}',
+        reply_markup=get_invitation_to_team_ikb(team_name)
+    )
+    await message.answer(f'Пользователю {input_nickname} отправлено приглашение')
 
+
+@dp.callback_query_handler(lambda callback: callback.data.startswith('accept_invitation_'))
+async def accept_invitation(callback: types.CallbackQuery) -> None:
+    team_name = callback.data.replace('accept_invitation_')
+    user_chat_id = str(callback.message.chat.id)
+
+    db = Database()
+    db.action(
+        *get_prompts_add_teammate(user_chat_id, team_name)
+    )
+    nickname = db.get_data_list(
+        get_prompt_view_nickname_by_id(user_chat_id)
+    )[0]['nickname']
+    captain_chat_id = db.get_data_list(
+        get_prompt_view_captain(team_name)
+    )[0]['captain_chat_id']
+
+    await bot.send_message(
+        captain_chat_id,
+        f'Пользователь {nickname} принял ваше приглашение в команду'
+    )
+
+
+@dp.callback_query_handler(lambda callback: callback.data.startswith('decline_invitation_'))
+async def decline_invitation(callback: types.CallbackQuery) -> None:
+    team_name = callback.data.replace('decline_invitation_')
+    user_chat_id = str(callback.message.chat.id)
+
+    db = Database()
+    nickname = db.get_data_list(
+        get_prompt_view_nickname_by_id(user_chat_id)
+    )[0]['nickname']
+    captain_chat_id = db.get_data_list(
+        get_prompt_view_captain(team_name)
+    )[0]['captain_chat_id']
+
+    await bot.send_message(
+        captain_chat_id,
+        f'Пользователь {nickname} отклонил ваше приглашение в команду'
+    )
 
 
 
@@ -227,7 +277,7 @@ async def confirm_delete_team(callback: types.CallbackQuery) -> None:
 
     for user in teammates_no_captain:
         await bot.send_message(
-            chat_id=user['chat_id'],
+            chat_id=int(user['chat_id']),
             text='Ваша команда была удалена'
         )
     await callback.message.delete()

@@ -76,30 +76,36 @@ def get_teammates_ikb(team_name: str,
                       user_chat_id: str) -> InlineKeyboardMarkup:
     db = Database()
 
-    captain = db.get_data_list(
+    captain_chat_id = db.get_data_list(
         get_prompt_view_captain(team_name)
     )[0]['captain_chat_id']
     captain_nick =  db.get_data_list(
-        get_prompt_view_username_by_id(captain)
+        get_prompt_view_username_by_id(captain_chat_id)
     )[0]['username']
-
+    
     inline_keyboard = []
+
+    if captain_chat_id != user_chat_id:
+        callback_data = ''
+    else:
+        callback_data = f'view_teammate'
+
     inline_keyboard.append([
         InlineKeyboardButton(
-            text=f'{captain_nick} - капитан', callback_data=f'view_teammate_{captain}'
+            text=f'{captain_nick} - капитан', callback_data=f"{callback_data}_{captain_chat_id}"
         )
     ])
 
     teammates_no_captain = db.get_data_list(
-        get_prompt_view_teammates(team_name, captain)
+        get_prompt_view_teammates(team_name, captain_chat_id)
     )
 
     for user in teammates_no_captain:
         inline_keyboard.append([
-            InlineKeyboardButton(text=user['username'], callback_data=f"view_teammate_{user['chat_id']}")
+            InlineKeyboardButton(text=user['username'], callback_data=f"{callback_data}_{user['chat_id']}")
         ])
 
-    if captain != user_chat_id:
+    if captain_chat_id != user_chat_id:
         inline_keyboard.append(
             [InlineKeyboardButton('Выйти из команды', callback_data='leave_team')]
         )
@@ -114,7 +120,7 @@ def get_teammates_ikb(team_name: str,
 
 
 def get_teammate_ikb(teammate_chat_id: str) -> InlineKeyboardMarkup:
-    inline_keyboard=[]
+    inline_keyboard = []
 
     db = Database()
     team_name = db.get_data_list(
@@ -129,9 +135,19 @@ def get_teammate_ikb(teammate_chat_id: str) -> InlineKeyboardMarkup:
         inline_keyboard.append(
             [InlineKeyboardButton('Удалить участника', callback_data=f"delete_teammate_{teammate_chat_id}")]
         )
-            
+
     inline_keyboard.append(
         [InlineKeyboardButton('Вернуться к участникам', callback_data=f"back_to_teammates_{team_name}")]
     )
 
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+
+
+def get_invitation_to_team_ikb(team_name: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton('Принять', callback_data=f'accept_invitation_{team_name}')],
+            [InlineKeyboardButton('Отклонить', callback_data=f'decline_invitation_{team_name}')]
+        ]
+    )

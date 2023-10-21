@@ -5,7 +5,8 @@ from .static import (main_kb,
                      confirm_delete_team_ikb)
 from .dynamic import (get_question_ikb,
                       get_teammates_ikb,
-                      get_teammate_ikb)
+                      get_teammate_ikb,
+                      get_invitation_to_team_ikb)
 
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     'get_question_ikb',
     'get_teammates_ikb',
     'get_teammate_ikb',
+    'get_invitation_to_team_ikb',
     'confirm_leave_ikb',
     'confirm_delete_team_ikb'
 ]
