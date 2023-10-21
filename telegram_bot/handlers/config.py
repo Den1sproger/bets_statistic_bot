@@ -6,3 +6,4 @@ class _ProfileStatesGroup(StatesGroup):
     get_team_name = State()
     get_nickname_for_team = State()
     get_start_nickname = State()
+    get_new_nickname = State()

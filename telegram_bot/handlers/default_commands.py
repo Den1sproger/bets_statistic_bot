@@ -1,15 +1,38 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
+from aiogram.dispatcher import FSMContext
 from database import (Database,
                       get_prompt_view_user_stat,
                       get_prompt_view_user_team,
                       get_prompt_view_team_stat,
-                      PROMPT_VIEW_POOLE_STAT)
+                      get_prompt_view_nickname_by_id,
+                      get_prompt_update_nickname,
+                      PROMPT_VIEW_POOLE_STAT,
+                      PROMPT_VIEW_NICKNAMES)
+from googlesheets import Stat_mass
+from .config import _ProfileStatesGroup
 from ..assets import VOTING_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import (sport_types_ikb,
                          team_create_ikb,
                          get_teammates_ikb)
+
+
+
+HELP_TEXT = """
+/start - запустить бота
+/help - помощь
+/voting - голосование
+/statistics - статистика
+/myteam - моя команда
+/nickname - обновить ник
+"""
+
+
+@dp.message_handler(Command('help'))
+async def help(message: types.Message) -> None:
+    await message.answer(HELP_TEXT)
+
 
 
 
@@ -95,3 +118,46 @@ async def statistics(message: types.Message) -> None:
         f"Стат пула:✅{poole_stat['positive_bets']}\t❌{poole_stat['negative_bets']}\tROI {poole_roi}\n"
     
     await message.answer(statistics_text, parse_mode='HTML')
+
+
+
+
+@dp.message_handler(Command('nickname'))
+async def change_nick(message: types.Message) -> None:
+    await _ProfileStatesGroup.get_new_nickname.set()
+    await message.answer(
+        '💬 Введите Ник, который будет отображаться в команде'
+    )
+
+
+
+@dp.message_handler(state=_ProfileStatesGroup.get_new_nickname)
+async def get_nickname(message: types.Message, state: FSMContext) -> None:
+    nickname = message.text
+    user_chat_id = str(message.chat.id)
+
+    db = Database()
+    nicknames = [i['nickname'] for i in db.get_data_list(PROMPT_VIEW_NICKNAMES)]
+
+    if nickname in nicknames:
+        await message.answer(
+            '❌❌Такой псевдоним уже занят'
+        )
+        return
+    
+    await state.finish()
+    
+    old_nick = db.get_data_list(
+        get_prompt_view_nickname_by_id(user_chat_id)
+    )[0]['nickname']
+    
+    gs_table = Stat_mass()           # update the nickname in users table
+    gs_table.update_nickname(new_nick=nickname, old_nick=old_nick)
+
+    db.action(
+        get_prompt_update_nickname(
+            chat_id=user_chat_id, new_nick=nickname
+        )
+    )
+
+    await message.answer("✅ Ник принят")

@@ -19,14 +19,6 @@ WELCOME = """
 Привет, здесь ты можешь вести статистику своих ставок
 """
 
-HELP_TEXT = """
-/start - запустить бота
-/help - помощь
-/voting - голосование
-/statistics - статистика
-/myteam - моя команда
-"""
-
 
 
 @dp.message_handler(Command('start'))
@@ -96,9 +88,3 @@ async def get_start_nickname(message: types.Message,
     await bot.set_my_commands(
         default_commands, scope=BotCommandScopeChat(message.chat.id) 
     )
-
-
-
-@dp.message_handler(Command('help'))
-async def help(message: types.Message) -> None:
-    await message.answer(HELP_TEXT)
