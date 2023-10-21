@@ -14,7 +14,7 @@ CLIENT_ID = os.getenv('client_id')
 CLIENT_X509_CERT_URL = os.getenv('client_x509_cert_url')
 
 # spreadsheet id
-SPREADSHEET_ID = os.getenv('spreadsheet_id')
+SPREADSHEET_ID = os.getenv('stat_spreadsheet_id')
 
 # worksheet urls
 GAMES_SPREADSHEET_URL = os.getenv('games_spreadsheet_url')

@@ -30,7 +30,7 @@ CREATE TABLE users
     team_name varchar(50)
 );
 -- adding data to the table immediately after creation
-INSERT INTO users (username, positive_bets, negative_bets, coeff_sum, roi) VALUES ('poole', 0, 0, 0, 0)
+INSERT INTO users (username, positive_bets, negative_bets, coeff_sum, roi) VALUES ('poole', 0, 0, 0, 0);
 
 
 CREATE TABLE positive_votes_poole

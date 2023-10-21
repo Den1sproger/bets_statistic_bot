@@ -143,6 +143,7 @@ async def get_nickname(message: types.Message, state: FSMContext) -> None:
         await message.answer(
             '❌❌Такой псевдоним уже занят'
         )
+        await state.finish()
         return
     
     await state.finish()
