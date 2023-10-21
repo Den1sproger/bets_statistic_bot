@@ -277,7 +277,7 @@ async def confirm_delete_team(callback: types.CallbackQuery) -> None:
 
     for user in teammates_no_captain:
         await bot.send_message(
-            chat_id=int(user['chat_id']),
+            chat_id=user['chat_id'],
             text='Ваша команда была удалена'
         )
     await callback.message.delete()
