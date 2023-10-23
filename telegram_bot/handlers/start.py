@@ -15,11 +15,6 @@ from ..keyboards import main_kb
 
 
 
-WELCOME = """
-Привет, здесь ты можешь вести статистику своих ставок
-"""
-
-
 
 @dp.message_handler(Command('start'))
 async def start(message: types.Message) -> None:
@@ -36,17 +31,15 @@ async def start(message: types.Message) -> None:
         prompts = get_prompts_add_user(username, user_chat_id)
         db.action(*prompts)
         await _ProfileStatesGroup.get_start_nickname.set()
-
         with open(START_PHOTO_PATH, 'rb') as file:
             await message.answer_photo(
                 photo=types.InputFile(file),
-                caption=WELCOME + '\n📍Придумайте Ник, который будет отображаться в турнирах'
+                text='📍Введите свой Ник'
             )
+
     else:
         with open(START_PHOTO_PATH, 'rb') as file:
-            await message.answer_photo(
-                photo=types.InputFile(file), caption=WELCOME
-            )
+            await message.answer_photo(photo=types.InputFile(file))
     
 
 
@@ -82,9 +75,8 @@ async def get_start_nickname(message: types.Message,
     sst = Stat_sport_types()
     sst.add_user(user_chat_id)
     
-
     await state.finish()
-    await message.answer(text="✅ Ник принят", reply_markup=main_kb)
+    await message.answer(text="🟢Ник принят", reply_markup=main_kb)
     await bot.set_my_commands(
         default_commands, scope=BotCommandScopeChat(message.chat.id) 
     )

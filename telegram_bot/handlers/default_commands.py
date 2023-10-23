@@ -58,7 +58,7 @@ async def my_team(message: types.Message) -> None:
 
     if user_team:
         await message.answer(
-            text=f'{user_team}\nСписок команды:',
+            text='👥 Список участников команды',
             reply_markup=get_teammates_ikb(
                 user_chat_id=user_chat_id, team_name=user_team
             )
