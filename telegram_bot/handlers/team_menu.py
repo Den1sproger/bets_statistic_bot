@@ -13,6 +13,7 @@ from database import (Database,
                       get_prompts_delete_team,
                       get_prompt_view_captain,
                       get_prompt_view_nickname_by_id)
+from ..assets import TEAM_PHOTO_PATH
 from .config import _ProfileStatesGroup
 from ..bot_config import dp, bot
 from ..keyboards import (confirm_leave_ikb,
@@ -24,11 +25,14 @@ from ..keyboards import (confirm_leave_ikb,
 
 
 
-
 @dp.callback_query_handler(lambda callback: callback.data == 'create_team')
 async def create_team(callback: types.CallbackQuery) -> None:
     await callback.message.delete()
-    await callback.message.answer('Введите название команды')
+    with open(TEAM_PHOTO_PATH, 'rb') as file:
+        await callback.message.answer_photo(
+            photo=types.InputFile(file),
+            caption='📍Введите название своей команды'
+        )
     await _ProfileStatesGroup.get_team_name.set()
 
 
@@ -50,7 +54,17 @@ async def get_team_name(message: types.Message,
     )
     await state.finish()
     await message.answer(
-        text='Ваша команда успешно создана\nДля управления жмите кнопку "Моя команда"'
+        text='🟢 Ваша команда успешно создана\n\n' \
+        '📣 ОСНОВНЫЕ ПОЛОЖЕНИЯ\n' \
+        '♦️ команда может включать в себя до 10 участников\n' \
+        '♦️ участник может состоять только в одной команде\n' \
+        '♦️ итоговый выбор команды осуществляется по большему количеству голосов\n'
+    )
+    await message.answer(
+        text='👥 Список участников команды:',
+        reply_markup=get_teammates_ikb(
+            user_chat_id=user_chat_id, team_name=team_name
+        )
     )
 
 
@@ -175,7 +189,7 @@ async def get_team_name(message: types.Message, state=FSMContext) -> None:
 
 @dp.callback_query_handler(lambda callback: callback.data.startswith('accept_invitation_'))
 async def accept_invitation(callback: types.CallbackQuery) -> None:
-    team_name = callback.data.replace('accept_invitation_')
+    team_name = callback.data.replace('accept_invitation_', '')
     user_chat_id = str(callback.message.chat.id)
 
     db = Database()
@@ -194,10 +208,24 @@ async def accept_invitation(callback: types.CallbackQuery) -> None:
         f'Пользователь {nickname} принял ваше приглашение в команду'
     )
 
+    await callback.message.answer(
+        text='🟢 Вы успешно добавлены \n\n' \
+        '📣 ОСНОВНЫЕ ПОЛОЖЕНИЯ\n' \
+        '♦️ команда может включать в себя до 10 участников\n' \
+        '♦️ участник может состоять только в одной команде\n' \
+        '♦️ итоговый выбор команды осуществляется по большему количеству голосов\n'
+    )
+    await callback.message.answer(
+        text='👥 Список участников команды:',
+        reply_markup=get_teammates_ikb(
+            user_chat_id=user_chat_id, team_name=team_name
+        )
+    )
+
 
 @dp.callback_query_handler(lambda callback: callback.data.startswith('decline_invitation_'))
 async def decline_invitation(callback: types.CallbackQuery) -> None:
-    team_name = callback.data.replace('decline_invitation_')
+    team_name = callback.data.replace('decline_invitation_', '')
     user_chat_id = str(callback.message.chat.id)
 
     db = Database()

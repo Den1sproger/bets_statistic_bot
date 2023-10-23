@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import (Database,
                       get_prompt_view_votes,
                       get_prompt_view_captain,
-                      get_prompt_view_username_by_id,
+                      get_prompt_view_nickname_by_id,
                       get_prompt_view_teammates,
                       get_prompt_view_user_team)
 
@@ -30,9 +30,9 @@ def get_question_ikb(quantity: int,
         part_second = int(round(100 * (poole_second/all_votes), 0))
         part_draw = int(round(100 * (poole_draw/all_votes), 0))
 
-        team_1 = f"{part_first}% - {poole_first} голосов"
-        team_2 = f"{part_second}% - {poole_second} голосов"
-        draw = f"{part_draw}% - {poole_draw} голосов"
+        team_1 = f"{part_first}% - {poole_first} чел."
+        team_2 = f"{part_second}% - {poole_second} чел."
+        draw = f"{part_draw}% - {poole_draw} чел."
 
         if answer == 1: team_1 = f"👉{team_1}👈"
         elif answer == 2: team_2 = f"👉{team_2}👈"
@@ -80,8 +80,8 @@ def get_teammates_ikb(team_name: str,
         get_prompt_view_captain(team_name)
     )[0]['captain_chat_id']
     captain_nick =  db.get_data_list(
-        get_prompt_view_username_by_id(captain_chat_id)
-    )[0]['username']
+        get_prompt_view_nickname_by_id(captain_chat_id)
+    )[0]['nickname']
     
     inline_keyboard = []
 
@@ -102,7 +102,7 @@ def get_teammates_ikb(team_name: str,
 
     for user in teammates_no_captain:
         inline_keyboard.append([
-            InlineKeyboardButton(text=user['username'], callback_data=f"{callback_data}_{user['chat_id']}")
+            InlineKeyboardButton(text=user['nickname'], callback_data=f"{callback_data}_{user['chat_id']}")
         ])
 
     if captain_chat_id != user_chat_id:
