@@ -9,6 +9,7 @@ from .config import SPREADSHEET_ID, CREDENTIALS
 
 
 
+
 class Connect:
     """Base class for the sheet with the users data"""
 
@@ -24,6 +25,7 @@ class Connect:
 
 
     
+
 class Stat_mass(Connect):
     """Class for the work with the data in the worksheet with the all users"""
 
@@ -45,7 +47,7 @@ class Stat_mass(Connect):
     
 
     def add_user(self, chat_id: str, username: str, nickname: str) -> None:
-        # add user in table
+        # add user to table
         chat_ids = self.worksheet.col_values(1)
         if chat_id not in chat_ids:
             row = len(chat_ids) + 1
@@ -58,6 +60,7 @@ class Stat_mass(Connect):
     def update_nickname(self, new_nick: str, old_nick: str) -> None:
         cell = self.worksheet.find(old_nick, in_column=3)
         self.worksheet.update_cell(row=cell.row, col=3, value=new_nick)
+
 
 
 
@@ -112,23 +115,11 @@ class Stat_sport_types(Connect):
                 )
             self.worksheet.batch_update(update_data)
 
-    
-    # def reset_votes(self):
-    #     update_data = []
-
-    #     for sport_type in SPORT_TYPES:
-    #         update_data.append(
-    #             {
-    #                 f'{self.__get_column("positive_bets", sport_type)}2:{self.__get_column("negative_bets")}{row}',
-    #                 [[chat_id, username, 0, 0, 0]]
-    #             }
-    #         ) 
-    #     self.worksheet.batch_update(update_data)
 
 
 
 class Games(Connect):
-    """"""
+    """Class for the work with the games in googlesheet"""
 
     CELLS_COLS = {
         'game_number': 'A',
@@ -148,7 +139,7 @@ class Games(Connect):
 
 
     def update_votes(self, game_key: str) -> None:
-        # update votes in te last column for the one team
+        # update votes in the last column for the one team
         db = Database()
         games = db.get_data_list(PROMPT_VIEW_GAMES)
 
@@ -158,7 +149,9 @@ class Games(Connect):
         for game in games:
             teams = [[game['poole_first']], [game['poole_second']]]
             draw = game['poole_draw']
-            if draw != None: teams.append([draw])
+
+            if draw != None:
+                teams.append([draw])       # add draw poole
 
             if game['game_key'] == game_key:
                 votes = teams
