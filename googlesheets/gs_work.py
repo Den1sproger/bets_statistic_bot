@@ -57,8 +57,8 @@ class Stat_mass(Connect):
             )
 
     
-    def update_nickname(self, new_nick: str, old_nick: str) -> None:
-        cell = self.worksheet.find(old_nick, in_column=3)
+    def update_nickname(self, new_nick: str, chat_id: str) -> None:
+        cell = self.worksheet.find(chat_id, in_column=1)
         self.worksheet.update_cell(row=cell.row, col=3, value=new_nick)
 
 
