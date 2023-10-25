@@ -32,7 +32,7 @@ def get_prompts_add_user(username: str,
                          chat_id: str) -> list[str]:
     prompts = [f"INSERT INTO users (username, chat_id, positive_bets, negative_bets, coeff_sum, roi) VALUES ('{username}', '{chat_id}', 0, 0, 0, 0);"]
     for sport_type in SPORT_TYPES:
-        prompts.append(f"INSERT INTO currents_users_roi (chat_id, sport_type, positive_bets, negative_bets, roi) VALUES ('{chat_id}', '{sport_type}', 0, 0, 0);")
+        prompts.append(f"INSERT INTO sports_users_roi (chat_id, sport_type, positive_bets, negative_bets, coeff_sum, roi) VALUES ('{chat_id}', '{sport_type}', 0, 0, 0, 0);")
     return prompts
 
 
@@ -126,8 +126,8 @@ def get_prompt_view_captain(team_name: str) -> str:
 def get_prompt_create_team(team_name: str,
                            captain: str) -> list[str]:
     return (
-        f"INSERT INTO teams (team_name, captain_chat_id, positive_bets, negative_bets, roi, teammates)" \
-        f"VALUES ('{team_name}', '{captain}', 0, 0, 0, 1);",
+        f"INSERT INTO teams (team_name, captain_chat_id, positive_bets, negative_bets, coeff_sum, roi, teammates)" \
+        f"VALUES ('{team_name}', '{captain}', 0, 0, 0, 0, 1);",
         f"UPDATE users SET team_name='{team_name}' WHERE chat_id='{captain}';"
     )
 
