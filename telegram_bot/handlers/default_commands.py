@@ -132,9 +132,9 @@ async def show_statistics(callback: types.CallbackQuery) -> None:
     # message
     statistics_text = f"""
     <b>СТАТИСТИКА</b>
-    Стат мой:✅{user_stat['positive_bets']}    ❌{user_stat['negative_bets']}    ROI {user_roi}
-    Стат команды:✅{team_positive}    ❌{team_negative}    ROI {team_roi}
-    Стат пула:✅{poole_stat['positive_bets']}    ❌{poole_stat['negative_bets']}    ROI {poole_roi}
+Стат мой:         ✅{user_stat['positive_bets']}    ❌{user_stat['negative_bets']}    ROI {user_roi}
+Стат команды:✅{team_positive}    ❌{team_negative}    ROI {team_roi}
+Стат пула:        ✅{poole_stat['positive_bets']}    ❌{poole_stat['negative_bets']}    ROI {poole_roi}
     """
     
     await callback.message.answer(text=statistics_text,
