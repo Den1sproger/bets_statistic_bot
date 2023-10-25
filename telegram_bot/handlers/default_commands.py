@@ -5,16 +5,17 @@ from database import (Database,
                       get_prompt_view_user_stat,
                       get_prompt_view_user_team,
                       get_prompt_view_team_stat,
-                      get_prompt_view_nickname_by_id,
                       get_prompt_update_nickname,
                       PROMPT_VIEW_POOLE_STAT,
                       PROMPT_VIEW_NICKNAMES)
 from googlesheets import Stat_mass
 from .config import _ProfileStatesGroup
-from ..assets import VOTING_PHOTO_PATH
+from ..assets import VOTING_PHOTO_PATH, TEAM_PHOTO_PATH, START_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import (sport_types_ikb,
                          team_create_ikb,
+                         main_ikb,
+                         back_to_main_menu_ikb,
                          get_teammates_ikb)
 
 
@@ -22,9 +23,7 @@ from ..keyboards import (sport_types_ikb,
 HELP_TEXT = """
 /start - запустить бота
 /help - помощь
-/voting - голосование
-/statistics - статистика
-/myteam - моя команда
+/menu - главное меню
 /nickname - обновить ник
 """
 
@@ -36,20 +35,38 @@ async def help(message: types.Message) -> None:
 
 
 
-@dp.message_handler(Text(equals='Голосование'))
-@dp.message_handler(Command('voting'))
-async def voting(message: types.Message) -> None:
-    with open(VOTING_PHOTO_PATH, 'rb') as file:
+@dp.callback_query_handler(lambda callback: callback.data == 'main_menu')
+async def back_to_main_menu(callback: types.CallbackQuery) -> None:
+    with open(START_PHOTO_PATH, 'rb') as file:
+        await callback.message.answer_photo(photo=types.InputFile(file),
+                                            reply_markup=main_ikb)
+    await callback.message.delete()
+    
+
+
+@dp.message_handler(Command('menu'))
+async def show_main_menu(message: types.Message) -> None:
+    with open(START_PHOTO_PATH, 'rb') as file:
         await message.answer_photo(photo=types.InputFile(file),
-                                   caption='Выберите вид спорта',
-                                   reply_markup=sport_types_ikb)
+                                   reply_markup=main_ikb)
 
 
 
-@dp.message_handler(Text(equals='Моя команда'))
-@dp.message_handler(Command('myteam'))
-async def my_team(message: types.Message) -> None:
-    user_chat_id = str(message.chat.id)
+
+@dp.callback_query_handler(lambda callback: callback.data == 'main_voting')
+async def show_voting(callback: types.CallbackQuery) -> None:
+    with open(VOTING_PHOTO_PATH, 'rb') as file:
+        await callback.message.answer_photo(photo=types.InputFile(file),
+                                            caption='Выберите вид спорта',
+                                            reply_markup=sport_types_ikb)
+    await callback.message.delete()
+
+
+
+
+@dp.callback_query_handler(lambda callback: callback.data == 'main_my_team')
+async def show_my_team(callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
 
     db = Database()
     user_team = db.get_data_list(
@@ -57,7 +74,7 @@ async def my_team(message: types.Message) -> None:
     )[0]['team_name']
 
     if user_team:
-        await message.answer(
+        await callback.message.answer(
             text='👥 Список участников команды',
             reply_markup=get_teammates_ikb(
                 user_chat_id=user_chat_id, team_name=user_team
@@ -65,17 +82,19 @@ async def my_team(message: types.Message) -> None:
         )
         return
     
-    await message.answer(
-        text='Вы не состоите в команде, можете создать команду и вы будете капитаном команды',
-        reply_markup=team_create_ikb
-    )
+    with open(TEAM_PHOTO_PATH, 'rb') as file:
+        await callback.message.answer_photo(
+            photo=types.InputFile(file),
+            reply_markup=team_create_ikb
+        )
+    await callback.message.delete()
 
 
 
-@dp.message_handler(Text(equals='Статистика'))
-@dp.message_handler(Command('statistics'))
-async def statistics(message: types.Message) -> None:
-    user_chat_id = str(message.chat.id)
+
+@dp.callback_query_handler(lambda callback: callback.data == 'main_statistics')
+async def show_statistics(callback: types.CallbackQuery) -> None:
+    user_chat_id = str(callback.message.chat.id)
     db = Database()
 
     # user statistics
@@ -111,12 +130,17 @@ async def statistics(message: types.Message) -> None:
         poole_roi = f'+{poole_roi}'
 
     # message
-    statistics_text = "<b>СТАТИСТИКА</b>\n" \
-        f"Стат мой:✅{user_stat['positive_bets']}\t❌{user_stat['negative_bets']}\tROI {user_roi}\n" \
-        f"Стат команды:✅{team_positive}\t❌{team_negative}\tROI {team_roi}\n" \
-        f"Стат пула:✅{poole_stat['positive_bets']}\t❌{poole_stat['negative_bets']}\tROI {poole_roi}\n"
+    statistics_text = f"""
+    <b>СТАТИСТИКА</b>
+    Стат мой:✅{user_stat['positive_bets']}    ❌{user_stat['negative_bets']}    ROI {user_roi}
+    Стат команды:✅{team_positive}    ❌{team_negative}    ROI {team_roi}
+    Стат пула:✅{poole_stat['positive_bets']}    ❌{poole_stat['negative_bets']}    ROI {poole_roi}
+    """
     
-    await message.answer(statistics_text, parse_mode='HTML')
+    await callback.message.answer(text=statistics_text,
+                                  parse_mode='HTML',
+                                  reply_markup=back_to_main_menu_ikb)
+    await callback.message.delete()
 
 
 
@@ -125,7 +149,7 @@ async def statistics(message: types.Message) -> None:
 async def change_nick(message: types.Message) -> None:
     await _ProfileStatesGroup.get_new_nickname.set()
     await message.answer(
-        '💬 Введите Ник, который будет отображаться в команде'
+        '📍 Введите новый Ник'
     )
 
 
@@ -140,19 +164,15 @@ async def get_nickname(message: types.Message, state: FSMContext) -> None:
 
     if nickname in nicknames:
         await message.answer(
-            '❌❌Такой псевдоним уже занят'
+            '❌ Этот Ник уже занят\n📍 Введите новый Ник'
         )
         await state.finish()
         return
     
     await state.finish()
     
-    old_nick = db.get_data_list(
-        get_prompt_view_nickname_by_id(user_chat_id)
-    )[0]['nickname']
-    
     gs_table = Stat_mass()           # update the nickname in users table
-    gs_table.update_nickname(new_nick=nickname, old_nick=old_nick)
+    gs_table.update_nickname(new_nick=nickname, chat_id=user_chat_id)
 
     db.action(
         get_prompt_update_nickname(
@@ -160,4 +180,4 @@ async def get_nickname(message: types.Message, state: FSMContext) -> None:
         )
     )
 
-    await message.answer("✅ Ник принят")
+    await message.answer("🟢 Ник принят")

@@ -114,7 +114,10 @@ def get_teammates_ikb(team_name: str,
             [InlineKeyboardButton('Добавить участника', callback_data=f'add_teammate_{team_name}')],
             [InlineKeyboardButton('Удалить команду', callback_data='delete_team')],
         ]
-        
+    
+    inline_keyboard.append(
+        [InlineKeyboardButton('ГЛАВНОЕ МЕНЮ', callback_data='main_menu')]
+    )
     ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return ikb
 

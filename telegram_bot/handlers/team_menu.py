@@ -110,7 +110,7 @@ async def delete_teammate(callback: types.CallbackQuery) -> None:
 @dp.callback_query_handler(lambda callback: callback.data.startswith('back_to_teammates_'))
 async def back_to_teammates(callback: types.CallbackQuery) -> None:
     team_name = callback.data.replace('back_to_teammates_', '')
-    await callback.message.edit_text(f'{team_name}\nСписок команды:')
+    await callback.message.edit_text(f'👥 Список участников команды:')
     await callback.message.edit_reply_markup(
         get_teammates_ikb(
             user_chat_id=str(callback.message.chat.id), team_name=team_name
@@ -135,8 +135,7 @@ async def add_teammate(callback: types.CallbackQuery) -> None:
         return
     
     await callback.message.answer(
-        'Введите nickname человека, которого хотите добавить\n' \
-        'Данный ник вводится при нажатии команды /start в этом боте'
+        '📎 Введите Ник человека, которого хотите добавить'
     )
     await _ProfileStatesGroup.get_nickname_for_team.set()
 
@@ -181,7 +180,7 @@ async def get_team_name(message: types.Message, state=FSMContext) -> None:
     await state.finish()
     await bot.send_message(
         chat_id=user_chat_id,
-        text=f'Вас хотят пригласить в команду {team_name}',
+        text=f'Вам направлено приглашение в команду {team_name}',
         reply_markup=get_invitation_to_team_ikb(team_name)
     )
     await message.answer(f'Пользователю {input_nickname} отправлено приглашение')
@@ -205,15 +204,7 @@ async def accept_invitation(callback: types.CallbackQuery) -> None:
 
     await bot.send_message(
         captain_chat_id,
-        f'Пользователь {nickname} принял ваше приглашение в команду'
-    )
-
-    await callback.message.answer(
-        text='🟢 Вы успешно добавлены \n\n' \
-        '📣 ОСНОВНЫЕ ПОЛОЖЕНИЯ\n' \
-        '♦️ команда может включать в себя до 10 участников\n' \
-        '♦️ участник может состоять только в одной команде\n' \
-        '♦️ итоговый выбор команды осуществляется по большему количеству голосов\n'
+        f'🟢 Пользователь {nickname} принял приглашение в команду'
     )
     await callback.message.answer(
         text='👥 Список участников команды:',
@@ -236,9 +227,11 @@ async def decline_invitation(callback: types.CallbackQuery) -> None:
         get_prompt_view_captain(team_name)
     )[0]['captain_chat_id']
 
+    await callback.message.delete()
+    await callback.message.answer('🚫 Вы отклонили приглашение')
     await bot.send_message(
         captain_chat_id,
-        f'Пользователь {nickname} отклонил ваше приглашение в команду'
+        f'🚫 Пользователь {nickname} отклонил приглашение в команду'
     )
 
 
@@ -247,7 +240,7 @@ async def decline_invitation(callback: types.CallbackQuery) -> None:
 @dp.callback_query_handler(lambda callback: callback.data == 'leave_team')
 async def leave_team(callback: types.CallbackQuery) -> None:
     await callback.message.edit_text(
-        text='Вы точно хотите выйти из команды?\nДобавить вас обратно может только администратор'
+        text='Вы точно хотите выйти из команды?\nДобавить Вас обратно может только капитан команды'
     )
     await callback.message.edit_reply_markup(confirm_leave_ikb)
 
@@ -277,7 +270,7 @@ async def confirm_leave(callback: types.CallbackQuery) -> None:
     await callback.message.answer('Вы покинули команду')
     await bot.send_message(
         chat_id=captain_chat_id,
-        text=f'{nickname} покинул команду'
+        text=f'🚫 Пользователь {nickname} покинул команду'
     )
 
 
@@ -306,14 +299,25 @@ async def confirm_delete_team(callback: types.CallbackQuery) -> None:
     for user in teammates_no_captain:
         await bot.send_message(
             chat_id=user['chat_id'],
-            text='Ваша команда была удалена'
+            text=f'🚫 Внимание! Команда {team_name} удалена'
         )
     await callback.message.delete()
-    await callback.message.answer(f'Команда {team_name} удалена')
+    await callback.message.answer(f'🚫 Команда {team_name} удалена')
 
 
 
 
 @dp.callback_query_handler(lambda callback: callback.data == 'not_confirm')
 async def not_confirm(callback: types.CallbackQuery) -> None:
-    await callback.message.delete()
+    user_chat_id = str(callback.message.chat.id)
+    db = Database()
+    user_team = db.get_data_list(
+        get_prompt_view_user_team(user_chat_id)
+    )[0]['team_name']
+
+    await callback.message.edit_text('👥 Список участников команды')
+    await callback.message.edit_reply_markup(
+        get_teammates_ikb(
+            user_chat_id=user_chat_id, team_name=user_team
+        )
+    )

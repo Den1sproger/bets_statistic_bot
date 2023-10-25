@@ -11,7 +11,7 @@ from database import (Database,
 from .config import _ProfileStatesGroup
 from ..assets import START_PHOTO_PATH
 from ..bot_config import dp, bot, default_commands
-from ..keyboards import main_kb
+from ..keyboards import main_ikb
 
 
 
@@ -34,9 +34,8 @@ async def start(message: types.Message) -> None:
         with open(START_PHOTO_PATH, 'rb') as file:
             await message.answer_photo(
                 photo=types.InputFile(file),
-                text='📍Введите свой Ник'
+                caption='📍Введите свой Ник'
             )
-
     else:
         with open(START_PHOTO_PATH, 'rb') as file:
             await message.answer_photo(photo=types.InputFile(file))
@@ -57,7 +56,7 @@ async def get_start_nickname(message: types.Message,
 
     if nickname in nicknames:
         await message.answer(
-            '❌❌Такой псевдоним уже занят, напишите другой'
+            '❌ Этот Ник уже занят\n📍 Введите другой Ник'
         )
         return
     
@@ -76,7 +75,9 @@ async def get_start_nickname(message: types.Message,
     sst.add_user(user_chat_id)
     
     await state.finish()
-    await message.answer(text="🟢Ник принят", reply_markup=main_kb)
+    with open(START_PHOTO_PATH, 'rb') as file:
+        await message.answer_photo(photo=types.InputFile(file),
+                                   reply_markup=main_ikb)
     await bot.set_my_commands(
         default_commands, scope=BotCommandScopeChat(message.chat.id) 
     )
