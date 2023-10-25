@@ -115,8 +115,8 @@ def get_prompt_view_team_stat(team_name: str) -> str:
 
 
 def get_prompt_view_teammates(team_name: str,
-                              captain_chat_id: str) -> str:
-    return f"SELECT * FROM users WHERE team_name='{team_name}' AND chat_id <> '{captain_chat_id}';"
+                              user_chat_id: str) -> str:
+    return f"SELECT * FROM users WHERE team_name='{team_name}' AND chat_id <> '{user_chat_id}';"
 
 
 def get_prompt_view_captain(team_name: str) -> str:

@@ -103,7 +103,7 @@ async def update_questions_data(callback: types.CallbackQuery,
     )
     if answer: answer = answer[0]['answer']
     else: answer = None
-        
+    
     reply_markup, msg_text = get_update_msg(
         game=current_game, answer=answer,
         index=current_index, sport_type=sport_type
