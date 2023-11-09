@@ -122,8 +122,12 @@ def get_prompt_view_captain(team_name: str) -> str:
     return f"SELECT captain_chat_id FROM teams WHERE team_name='{team_name}';"
 
 
+def get_prompt_view_team_votes(team_name: str) -> str:
+    return f"SELECT * FROM answers WHERE team_name='{team_name}';"
+
+
 def get_prompt_create_team(team_name: str,
-                           captain: str) -> list[str]:
+                           captain: str) -> tuple[str]:
     return (
         f"INSERT INTO teams (team_name, captain_chat_id, positive_bets, negative_bets, coeff_sum, roi, teammates)" \
         f"VALUES ('{team_name}', '{captain}', 0, 0, 0, 0, 1);",
@@ -202,7 +206,7 @@ __all__ = [
     'get_prompt_delete_current_info',
     'get_prompt_update_current_info',
     'get_prompt_add_answer',
-    'get_prompt_view_answer'
+    'get_prompt_view_answer',
     'get_prompt_view_votes',
     'get_prompt_increase_current_index',
     'get_prompt_decrease_current_index',
@@ -219,5 +223,6 @@ __all__ = [
     'get_prompt_view_chat_id_by_name',
     'get_prompt_view_chat_id_by_nick',
     'get_prompt_view_team_size',
-    'get_prompt_update_game_status'
+    'get_prompt_update_game_status',
+    'get_prompt_view_team_votes'
 ]

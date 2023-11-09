@@ -4,6 +4,7 @@ from database import (Database,
                       get_prompt_view_captain,
                       get_prompt_view_nickname_by_id,
                       get_prompt_view_teammates,
+                      get_prompt_view_team_votes,
                       get_prompt_view_user_team)
 
 
@@ -11,6 +12,7 @@ from database import (Database,
 def get_question_ikb(quantity: int,
                      current_question_index: int,
                      coeffs: int,
+                     team_name: str = None,
                      answer: int = None,
                      game_key: str = None) -> InlineKeyboardMarkup:
     # keyboard for the one question
@@ -43,21 +45,50 @@ def get_question_ikb(quantity: int,
         team_2 = 'П2'
         draw = 'X'
 
+    inline_keyboard = []
+
+    if team_name:
+        db = Database()
+        voted_teammates = db.get_data_list(
+            get_prompt_view_team_votes(team_name)
+        )
+
+        msg_text = ''
+
+        if len(voted_teammates) == 0:
+            msg_text = '-'
+        else:
+            outcomes = [['П1', 0], ['П2', 0], ['Х', 0]]
+
+            for teammate in voted_teammates:
+                outcomes[teammate['answer'] - 1][1] += 1
+            
+            votes = (outcomes[0][1], outcomes[1][1], outcomes[2][1])
+            team_select_votes = max(votes)
+
+            team_outcome = ''
+            for item in outcomes:
+                if item[1] == team_select_votes:
+                    team_outcome = item[0]
+                    break
+                
+            msg_text = f'{team_outcome} - {round(team_select_votes / sum(votes) * 100, 0)}%'
+
+        inline_keyboard.append([
+            InlineKeyboardButton(f'Выбор команды {team_name}: {msg_text}', callback_data='0')
+        ])
+
     if coeffs == 3:
-        inline_keyboard = [
-            [
-                InlineKeyboardButton(team_1, callback_data='first_team'),
-                InlineKeyboardButton(draw, callback_data='draw'),
-                InlineKeyboardButton(team_2, callback_data='second_team')
-            ]
-        ]
+        inline_keyboard.append([
+            InlineKeyboardButton(team_1, callback_data='first_team'),
+            InlineKeyboardButton(draw, callback_data='draw'),
+            InlineKeyboardButton(team_2, callback_data='second_team')
+        ])
     else:
-        inline_keyboard = [
-            [
-                InlineKeyboardButton(team_1, callback_data='first_team'),
-                InlineKeyboardButton(team_2, callback_data='second_team')
-            ]
-        ]
+        inline_keyboard.append([
+            InlineKeyboardButton(team_1, callback_data='first_team'),
+            InlineKeyboardButton(team_2, callback_data='second_team')
+        ])
 
     inline_keyboard.append([
         InlineKeyboardButton('<', callback_data='previous_question'),
