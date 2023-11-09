@@ -10,12 +10,11 @@ from database import (Database,
                       PROMPT_VIEW_NICKNAMES)
 from googlesheets import Stat_mass
 from .config import _ProfileStatesGroup
-from ..assets import VOTING_PHOTO_PATH, TEAM_PHOTO_PATH, START_PHOTO_PATH
+from ..assets import VOTING_PHOTO_PATH, TEAM_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import (sport_types_ikb,
                          team_create_ikb,
-                         main_ikb,
-                         back_to_main_menu_ikb,
+                         main_kb,
                          get_teammates_ikb)
 
 
@@ -23,50 +22,36 @@ from ..keyboards import (sport_types_ikb,
 HELP_TEXT = """
 /start - запустить бота
 /help - помощь
-/menu - главное меню
+/voting - голосование
+/my_team - моя команда
+/statistics - статистика
 /nickname - обновить ник
 """
 
 
 @dp.message_handler(Command('help'))
 async def help(message: types.Message) -> None:
-    await message.answer(HELP_TEXT)
+    await message.answer(HELP_TEXT, reply_markup=main_kb)
 
 
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'main_menu')
-async def back_to_main_menu(callback: types.CallbackQuery) -> None:
-    with open(START_PHOTO_PATH, 'rb') as file:
-        await callback.message.answer_photo(photo=types.InputFile(file),
-                                            reply_markup=main_ikb)
-    await callback.message.delete()
-    
-
-
-@dp.message_handler(Command('menu'))
-async def show_main_menu(message: types.Message) -> None:
-    with open(START_PHOTO_PATH, 'rb') as file:
-        await message.answer_photo(photo=types.InputFile(file),
-                                   reply_markup=main_ikb)
-
-
-
-
-@dp.callback_query_handler(lambda callback: callback.data == 'main_voting')
-async def show_voting(callback: types.CallbackQuery) -> None:
+@dp.message_handler(Text(equals='Голосование'))
+@dp.message_handler(Command('voting'))
+async def show_voting(message: types.Message) -> None:
     with open(VOTING_PHOTO_PATH, 'rb') as file:
-        await callback.message.answer_photo(photo=types.InputFile(file),
+        await message.answer_photo(photo=types.InputFile(file),
                                             caption='Выберите вид спорта',
                                             reply_markup=sport_types_ikb)
-    await callback.message.delete()
+    await message.delete()
 
 
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'main_my_team')
-async def show_my_team(callback: types.CallbackQuery) -> None:
-    user_chat_id = str(callback.message.chat.id)
+@dp.message_handler(Text(equals='Моя команда'))
+@dp.message_handler(Command('my_team'))
+async def show_my_team(message: types.Message) -> None:
+    user_chat_id = str(message.chat.id)
 
     db = Database()
     user_team = db.get_data_list(
@@ -74,7 +59,7 @@ async def show_my_team(callback: types.CallbackQuery) -> None:
     )[0]['team_name']
 
     if user_team:
-        await callback.message.answer(
+        await message.answer(
             text='👥 Список участников команды',
             reply_markup=get_teammates_ikb(
                 user_chat_id=user_chat_id, team_name=user_team
@@ -83,18 +68,18 @@ async def show_my_team(callback: types.CallbackQuery) -> None:
         return
     
     with open(TEAM_PHOTO_PATH, 'rb') as file:
-        await callback.message.answer_photo(
+        await message.answer_photo(
             photo=types.InputFile(file),
             reply_markup=team_create_ikb
         )
-    await callback.message.delete()
 
 
 
 
-@dp.callback_query_handler(lambda callback: callback.data == 'main_statistics')
-async def show_statistics(callback: types.CallbackQuery) -> None:
-    user_chat_id = str(callback.message.chat.id)
+@dp.message_handler(Text(equals='Статистика'))
+@dp.message_handler(Command('statistics'))
+async def show_statistics(message: types.Message) -> None:
+    user_chat_id = str(message.chat.id)
     db = Database()
 
     # user statistics
@@ -137,10 +122,9 @@ async def show_statistics(callback: types.CallbackQuery) -> None:
 Стат пула:        ✅{poole_stat['positive_bets']}    ❌{poole_stat['negative_bets']}    ROI {poole_roi}
     """
     
-    await callback.message.answer(text=statistics_text,
-                                  parse_mode='HTML',
-                                  reply_markup=back_to_main_menu_ikb)
-    await callback.message.delete()
+    await message.answer(text=statistics_text,
+                         parse_mode='HTML',
+                         reply_markup=main_kb)
 
 
 
@@ -148,9 +132,7 @@ async def show_statistics(callback: types.CallbackQuery) -> None:
 @dp.message_handler(Command('nickname'))
 async def change_nick(message: types.Message) -> None:
     await _ProfileStatesGroup.get_new_nickname.set()
-    await message.answer(
-        '📍 Введите новый Ник'
-    )
+    await message.answer('📍 Введите новый Ник')
 
 
 

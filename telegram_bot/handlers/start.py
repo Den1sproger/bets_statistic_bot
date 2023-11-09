@@ -11,7 +11,7 @@ from database import (Database,
 from .config import _ProfileStatesGroup
 from ..assets import START_PHOTO_PATH
 from ..bot_config import dp, bot, default_commands
-from ..keyboards import main_ikb
+from ..keyboards import main_kb
 
 
 
@@ -38,7 +38,7 @@ async def start(message: types.Message) -> None:
             )
     else:
         with open(START_PHOTO_PATH, 'rb') as file:
-            await message.answer_photo(photo=types.InputFile(file))
+            await message.answer_photo(photo=types.InputFile(file), reply_markup=main_kb)
     
 
 
@@ -77,7 +77,7 @@ async def get_start_nickname(message: types.Message,
     await state.finish()
     with open(START_PHOTO_PATH, 'rb') as file:
         await message.answer_photo(photo=types.InputFile(file),
-                                   reply_markup=main_ikb)
+                                   reply_markup=main_kb)
     await bot.set_my_commands(
-        default_commands, scope=BotCommandScopeChat(message.chat.id) 
+        default_commands, scope=BotCommandScopeChat(message.chat.id)
     )

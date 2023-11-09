@@ -1,12 +1,14 @@
-from aiogram.types import (InlineKeyboardMarkup,
+from aiogram.types import (ReplyKeyboardMarkup,
+                           KeyboardButton,
+                           InlineKeyboardMarkup,
                            InlineKeyboardButton)
 
 
-main_ikb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton('Голосование', callback_data='main_voting')],
-        [InlineKeyboardButton('Моя команда', callback_data='main_my_team')],
-        [InlineKeyboardButton('Статистика', callback_data='main_statistics')]
+main_kb = ReplyKeyboardMarkup(
+    resize_keyboard=True,
+    keyboard=[
+        [KeyboardButton('Голосование'), KeyboardButton('Моя команда')],
+        [KeyboardButton('Статистика')]
     ]
 )
 
@@ -14,15 +16,13 @@ sport_types_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton('ФУТБОЛ', callback_data='voting_Футбол')],
         [InlineKeyboardButton('ХОККЕЙ', callback_data='voting_Хоккей')],
-        [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_Баскетбол')],
-        [InlineKeyboardButton('ГЛАВНОЕ МЕНЮ', callback_data='main_menu')]
+        [InlineKeyboardButton('БАСКЕТБОЛ', callback_data='voting_Баскетбол')]
     ]
 )
 
 team_create_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton('Создать команду', callback_data='create_team')],
-        [InlineKeyboardButton('ГЛАВНОЕ МЕНЮ', callback_data='main_menu')]
+        [InlineKeyboardButton('Создать команду', callback_data='create_team')]
     ]
 )
 
@@ -37,11 +37,5 @@ confirm_delete_team_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton('Подтвердить', callback_data='confirm_delete_team')],
         [InlineKeyboardButton('Отмена', callback_data='not_confirm')]
-    ]
-)
-
-back_to_main_menu_ikb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton('ГЛАВНОЕ МЕНЮ', callback_data='main_menu')]
     ]
 )

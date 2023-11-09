@@ -17,6 +17,8 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 default_commands = [
     BotCommand('start', 'Запустить бота'),
     BotCommand('help', 'Помощь'),
-    BotCommand('menu', 'Главное меню'),
+    BotCommand('voting', 'Голосование'),
+    BotCommand('my_team', 'Моя команда'),
+    BotCommand('statistics', 'Статистика'),
     BotCommand('nickname', 'Изменить ник')
 ]
