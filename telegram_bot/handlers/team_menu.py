@@ -134,10 +134,11 @@ async def add_teammate(callback: types.CallbackQuery) -> None:
         )
         return
     
+    await _ProfileStatesGroup.get_nickname_for_team.set()
     await callback.message.answer(
         '📎 Введите Ник человека, которого хотите добавить'
     )
-    await _ProfileStatesGroup.get_nickname_for_team.set()
+    
 
 
 @dp.message_handler(state=_ProfileStatesGroup.get_nickname_for_team)
@@ -173,9 +174,6 @@ async def get_team_name(message: types.Message, state=FSMContext) -> None:
     team_name = db.get_data_list(
         get_prompt_view_user_team(captain_chat_id)
     )[0]['team_name']
-    db.action(
-        *get_prompts_add_teammate(user_chat_id, team_name)
-    )
 
     await state.finish()
     await bot.send_message(
