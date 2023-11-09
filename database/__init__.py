@@ -156,22 +156,22 @@ def get_prompt_view_team_size(team_name: str) -> str:
 
 
 def get_prompts_leave_team(chat_id: str,
-                           team_name: str) -> str:
+                           team_name: str) -> tuple[str]:
     return (
         f"UPDATE users SET team_name=NULL WHERE chat_id='{chat_id}';",
-        f"UPDATE teams SET teammates=teammates=teammates-1 WHERE team_name='{team_name}'"
+        f"UPDATE teams SET teammates=teammates-1 WHERE team_name='{team_name}'"
     )
 
 
 def get_prompts_add_teammate(chat_id: str,
-                             team_name: str) -> str:
+                             team_name: str) -> tuple[str]:
     return (
         f"UPDATE users SET team_name='{team_name}' WHERE chat_id='{chat_id}';",
         f"UPDATE teams SET teammates=teammates+1 WHERE team_name='{team_name}'"
     )
 
 
-def get_prompts_delete_team(team_name: str) -> list[str]:
+def get_prompts_delete_team(team_name: str) -> tuple[str]:
     return (
         f"DELETE FROM teams WHERE team_name='{team_name}';",
         f"UPDATE users SET team_name=NULL WHERE team_name='{team_name}';"
