@@ -11,13 +11,13 @@ from database import (Database,
                       get_prompt_update_current_index,
                       get_prompt_view_current_info,
                       get_prompt_view_answer,
-                      get_prompt_update_answer,
                       get_prompt_add_answer,
                       get_prompt_increase_current_index,
                       get_prompt_decrease_current_index,
                       get_prompt_delete_current_info,
                       get_prompt_update_current_info,
                       get_prompt_update_vote,
+                      get_prompt_view_user_team,
                       get_prompt_update_game_status)
 
 
@@ -186,30 +186,20 @@ async def answer(answer: int,
         )
     )
 
-    prompts = []
-    prompts.append(
-        get_prompt_update_vote(game_key, answer, action='+')
-    )
-
-    if old_answer:
-        if old_answer[0]['answer'] == answer:
-            return
-        prompts.append(
-            get_prompt_update_answer(
-                chat_id=user_chat_id,
-                game_key=game_key, new_answer=answer
-            )
-        )
-        prompts.append(
-            get_prompt_update_vote(game_key, old_answer[0]['answer'], action='-')
-        )
+    if old_answer: return
     else:
-        prompts.append(
+        user_team = db.get_data_list(
+            get_prompt_view_user_team(user_chat_id)
+        )[0]['team_name']
+
+        prompts = [
+            get_prompt_update_vote(game_key, answer, action='+'),
             get_prompt_add_answer(
                 chat_id=user_chat_id,
-                game_key=game_key, answer=answer
+                game_key=game_key, answer=answer,
+                team_name=user_team
             )
-        )
+        ]
         
     db.action(*prompts)
     
