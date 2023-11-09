@@ -53,9 +53,22 @@ Save **db_name**, **password**, **user** and **host** to environment variables u
 #### Create db tables
 See SQL file => [make_tables.sql](https://github.com/Den1sproger/bets_statistic_bot/blob/main/database/make_tables.sql "make tables sql file")
 
-### Create Telegram Bot
-Go to [BotFather](https://t.me/BotFather "Bot Father") and create bot. Save API TOKEN to environment variable under the name **TOKEN**
+### Create GoogleSheets
 
+
+### Create Telegram Bot
+Go to [BotFather](https://t.me/BotFather "Bot Father") and create bot. Save API TOKEN to environment variable under the name **STATISTIC_TOKEN**
+
+### Launch main file
+Windows:
+```
+python app.py
+```
+
+Linux\Mac OS:
+```
+python3 app.py
+```
 
 ## Admin Telegram bot
 For the normal operation of this bot, it is necessary to activate the administrative bot.
