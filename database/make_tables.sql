@@ -33,16 +33,6 @@ CREATE TABLE users
 INSERT INTO users (username, positive_bets, negative_bets, coeff_sum, roi) VALUES ('poole', 0, 0, 0, 0);
 
 
-CREATE TABLE positive_votes_poole
-(
-    first_team int NOT NULL,
-    second_team int NOT NULL,
-    draw int NOT NULL
-);
--- adding data to the table immediately after creation
-INSERT INTO positive_votes_poole (first_team, second_team, draw) VALUES (0, 0, 0);
-
-
 CREATE TABLE sports_users_roi
 (
     chat_id varchar(50) NOT NULL,
