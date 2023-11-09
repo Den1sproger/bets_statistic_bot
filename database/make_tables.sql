@@ -49,6 +49,7 @@ CREATE TABLE answers
 (
     chat_id varchar(50) REFERENCES users(chat_id),
     game_key varchar(20) REFERENCES games(game_key),
+    team_name varchar(50) REFERENCES users(team_name),
     answer int NOT NULL,
     CONSTRAINT chat_key PRIMARY KEY (chat_id, game_key)
 );
