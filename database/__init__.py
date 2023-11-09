@@ -75,8 +75,13 @@ def get_prompt_update_current_info(chat_id: str,
 
 def get_prompt_add_answer(chat_id: str,
                           answer: int,
-                          game_key: str) -> str:
-    return f"INSERT INTO answers (chat_id, game_key, answer) VALUES ('{chat_id}', '{game_key}', {answer});"
+                          game_key: str,
+                          team_name: str = None) -> str:
+    if team_name:
+        team_name = f'"{team_name}"'
+    else:
+        team_name = 'NULL'
+    return f"INSERT INTO answers (chat_id, game_key, answer, team_name) VALUES ('{chat_id}', '{game_key}', {answer}, {team_name});"
 
 
 def get_prompt_view_answer(chat_id: str,
