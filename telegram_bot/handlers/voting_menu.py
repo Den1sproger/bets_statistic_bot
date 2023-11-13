@@ -61,6 +61,8 @@ def get_current_data(db: Database,
 def get_update_msg(game: dict,
                    index: int,
                    sport_type: str,
+                   db: Database,
+                   user_chat_id: str | int, 
                    answer: int = None) -> types.InlineKeyboardMarkup and str:    
     coeff_1 = game['first_coeff']
     coeff_2 = game['second_coeff']
@@ -79,9 +81,14 @@ def get_update_msg(game: dict,
         f'КОЭФФИЦИЕНТЫ: {coeffs_txt}\n\n' \
         f'ОБЗОР МАТЧА:\n{game["url"]}'
     
+    user_team = db.get_data_list(
+        get_prompt_view_user_team(user_chat_id)
+    )[0]['team_name']
+
     return get_question_ikb(
         quantity=len(questions[sport_type]),
         current_question_index=index,
+        team_name=user_team,
         coeffs=len(coeffs), answer=answer,
         game_key=game['game_key']
     ), msg_text
@@ -103,9 +110,10 @@ async def update_questions_data(callback: types.CallbackQuery,
     )
     if answer: answer = answer[0]['answer']
     else: answer = None
-    
+
     reply_markup, msg_text = get_update_msg(
         game=current_game, answer=answer,
+        db=db, user_chat_id=user_chat_id,
         index=current_index, sport_type=sport_type
     )
     
@@ -204,7 +212,9 @@ async def answer(answer: int,
     db.action(*prompts)
     
     reply_markup, _ = get_update_msg(
-        game=current_game, answer=answer, index=index, sport_type=sport_type
+        game=current_game, answer=answer,
+        index=index, sport_type=sport_type,
+        db=db, user_chat_id=user_chat_id
     )
 
     games_gs = Games()

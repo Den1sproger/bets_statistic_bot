@@ -56,27 +56,38 @@ def get_question_ikb(quantity: int,
 
         msg_text = ''
 
-        if len(voted_teammates) == 0:
+        if len(voted_teammates) == 0 or (not answer):
             msg_text = '-'
         else:
-            outcomes = [['П1', 0], ['П2', 0], ['Х', 0]]
+            outcomes = [['П1', 0], ['П2', 0], ['X', 0]]
 
             for teammate in voted_teammates:
                 outcomes[teammate['answer'] - 1][1] += 1
             
             votes = (outcomes[0][1], outcomes[1][1], outcomes[2][1])
-            team_select_votes = max(votes)
 
-            team_outcome = ''
-            for item in outcomes:
-                if item[1] == team_select_votes:
-                    team_outcome = item[0]
-                    break
-                
-            msg_text = f'{team_outcome} - {round(team_select_votes / sum(votes) * 100, 0)}%'
+            if votes[0] == votes[1] == votes[2]:
+                msg_text = '-'
+            elif 0 in votes:
+                tv = list(votes)
+                tv.remove(0)
+                if tv[0] == tv[1]:
+                    msg_text = '-'
+            
+            if msg_text != '-':
+                team_select_votes = max(votes)
+
+                team_outcome = ''
+                for item in outcomes:
+                    if item[1] == team_select_votes:
+                        team_outcome = item[0]
+                        break
+
+                percents = int(round(team_select_votes / sum(votes) * 100, 0))
+                msg_text = f'{team_outcome} - {percents}% ({team_select_votes} чел.)'
 
         inline_keyboard.append([
-            InlineKeyboardButton(f'Выбор команды {team_name}: {msg_text}', callback_data='0')
+            InlineKeyboardButton(f'👥 Выбор команды {team_name}: {msg_text}', callback_data='0')
         ])
 
     if coeffs == 3:
@@ -100,8 +111,7 @@ def get_question_ikb(quantity: int,
         [InlineKeyboardButton('Назад', callback_data='back_to_sport_types')]
     )
 
-    ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-    return ikb
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
 
@@ -149,8 +159,7 @@ def get_teammates_ikb(team_name: str,
             [InlineKeyboardButton('Удалить команду', callback_data='delete_team')],
         ]
     
-    ikb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-    return ikb
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
 
