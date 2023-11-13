@@ -183,6 +183,11 @@ def get_prompt_update_game_status(game_key: str,
     return f"UPDATE games SET game_status={status} WHERE game_key='{game_key}';"
 
 
+def get_prompts_reset_user_stat(chat_id: str | int) -> tuple[str]:
+    return (f"UPDATE users SET positive_bets=0, negative_bets=0, coeff_sum=0, roi=0 WHERE chat_id='{chat_id}';",
+            f"UPDATE sports_users_roi SET positive_bets=0, negative_bets=0, coeff_sum=0, roi=0 WHERE chat_id='{chat_id}';")
+
+
 
 __all__ = [
     'Database',
@@ -224,5 +229,6 @@ __all__ = [
     'get_prompt_view_chat_id_by_nick',
     'get_prompt_view_team_size',
     'get_prompt_update_game_status',
-    'get_prompt_view_team_votes'
+    'get_prompt_view_team_votes',
+    'get_prompts_reset_user_stat'
 ]

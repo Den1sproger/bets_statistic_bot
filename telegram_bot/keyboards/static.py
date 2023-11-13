@@ -39,3 +39,10 @@ confirm_delete_team_ikb = InlineKeyboardMarkup(
         [InlineKeyboardButton('Отмена', callback_data='not_confirm')]
     ]
 )
+
+confirm_reset_stat_ikb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton('Обнулить стат', callback_data='confirm_reset_stat')],
+        [InlineKeyboardButton('Отмена', callback_data='not_confirm')]
+    ]
+)

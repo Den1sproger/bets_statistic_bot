@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
@@ -6,15 +8,17 @@ from database import (Database,
                       get_prompt_view_user_team,
                       get_prompt_view_team_stat,
                       get_prompt_update_nickname,
+                      get_prompts_reset_user_stat,
                       PROMPT_VIEW_POOLE_STAT,
                       PROMPT_VIEW_NICKNAMES)
-from googlesheets import Stat_mass
+from googlesheets import Stat_mass, Stat_sport_types
 from .config import _ProfileStatesGroup
 from ..assets import VOTING_PHOTO_PATH, TEAM_PHOTO_PATH
 from ..bot_config import dp
 from ..keyboards import (sport_types_ikb,
                          team_create_ikb,
                          main_kb,
+                         confirm_reset_stat_ikb,
                          get_teammates_ikb)
 
 
@@ -26,6 +30,7 @@ HELP_TEXT = """
 /my_team - моя команда
 /statistics - статистика
 /nickname - обновить ник
+/reset_my_stat - обнулить стат
 """
 
 
@@ -163,3 +168,33 @@ async def get_nickname(message: types.Message, state: FSMContext) -> None:
     )
 
     await message.answer("🟢 Ник принят")
+
+
+
+
+@dp.message_handler(Command('reset_my_stat'))
+async def reset_user_stat(message: types.Message) -> None:
+    await message.answer(
+        text='Вы уверены что хотите обнулить свой стат?\nОтменить это действие будет невозможно',
+        reply_markup=confirm_reset_stat_ikb
+    )
+
+
+@dp.callback_query_handler(lambda callback: callback.data == 'confirm_reset_stat')
+async def confirm_reset_stat(callback: types.CallbackQuery) -> None:
+    await callback.message.delete()
+
+    user_chat_id = str(callback.message.chat.id)
+
+    sm = Stat_mass()
+    sm.reset_user_stat(user_chat_id)
+
+    sst = Stat_sport_types()
+    sst.reset_user_stat(user_chat_id)
+
+    db = Database()
+    db.action(*get_prompts_reset_user_stat(user_chat_id))
+
+    await callback.message.answer('✅Ваш стат обнулен')
+    
+

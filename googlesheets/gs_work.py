@@ -62,6 +62,14 @@ class Stat_mass(Connect):
         self.worksheet.update_cell(row=cell.row, col=3, value=new_nick)
 
 
+    def reset_user_stat(self, chat_id: str | int) -> None:
+        cell = self.worksheet.find(chat_id, in_column=1)
+        self.worksheet.update(
+            f"{self.CELLS_COLS['positive_bets']}{cell.row}",
+            [[0, 0, 0, 0]]
+        )
+
+
 
 
 class Stat_sport_types(Connect):
@@ -114,6 +122,24 @@ class Stat_sport_types(Connect):
                     }
                 )
             self.worksheet.batch_update(update_data)
+
+
+    def reset_user_stat(self, chat_id: str | int) -> None:
+        cell_soccer = self.worksheet.find(chat_id, in_column=1)
+        cell_hockey = self.worksheet.find(chat_id, in_column=6)
+        cell_basketball = self.worksheet.find(chat_id, in_column=11)
+
+        update_data = []
+
+        for sport_type, cell in zip(SPORT_TYPES, (cell_soccer, cell_hockey, cell_basketball)):
+            update_data.append(
+                {
+                    'range': f'{self.__get_column("positive_bets", sport_type)}{cell.row}',
+                    'values': [[0, 0, 0]]
+                }
+            )
+        
+        self.worksheet.batch_update(update_data)
 
 
 
