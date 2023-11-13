@@ -1,5 +1,3 @@
-import logging
-
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
