@@ -263,5 +263,4 @@ async def back_to_tourns(callback: types.CallbackQuery) -> None:
 
     with open(VOTING_PHOTO_PATH, 'rb') as file:
         await callback.message.answer_photo(photo=types.InputFile(file),
-                                            caption='Выберите вид спорта',
                                             reply_markup=sport_types_ikb)

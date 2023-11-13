@@ -46,8 +46,7 @@ async def help(message: types.Message) -> None:
 async def show_voting(message: types.Message) -> None:
     with open(VOTING_PHOTO_PATH, 'rb') as file:
         await message.answer_photo(photo=types.InputFile(file),
-                                            caption='Выберите вид спорта',
-                                            reply_markup=sport_types_ikb)
+                                   reply_markup=sport_types_ikb)
     await message.delete()
 
 
