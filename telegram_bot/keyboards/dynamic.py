@@ -9,6 +9,7 @@ from database import (Database,
 
 
 
+
 def get_question_ikb(quantity: int,
                      current_question_index: int,
                      coeffs: int,
@@ -103,6 +104,8 @@ def get_question_ikb(quantity: int,
     return ikb
 
 
+
+
 def get_teammates_ikb(team_name: str,
                       user_chat_id: str) -> InlineKeyboardMarkup:
     db = Database()
@@ -150,6 +153,8 @@ def get_teammates_ikb(team_name: str,
     return ikb
 
 
+
+
 def get_teammate_ikb(teammate_chat_id: str) -> InlineKeyboardMarkup:
     inline_keyboard = []
 
@@ -172,6 +177,7 @@ def get_teammate_ikb(teammate_chat_id: str) -> InlineKeyboardMarkup:
     )
 
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
 
 
 
