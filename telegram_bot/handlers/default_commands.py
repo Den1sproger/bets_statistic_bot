@@ -113,14 +113,14 @@ async def show_statistics(message: types.Message) -> None:
         team_profit = team_stat['coeff_sum'] - team_positive - team_negative
 
         if team_roi > 0:
-            team_roi = f'+{team_roi}'
+            team_roi = f'+{round(float(team_roi), 3)}'
         if team_profit > 0:
-            team_profit = f'+{team_profit}'
+            team_profit = f'+{round(float(team_profit), 2)}'
     else:
         team_positive = 0
         team_negative = 0
-        team_roi = 0
-        team_profit = 0
+        team_roi = 0.0
+        team_profit = 0.0
 
     # poole statistics
     poole_stat = db.get_data_list(PROMPT_VIEW_POOLE_STAT)[0]
@@ -145,8 +145,8 @@ async def show_statistics(message: types.Message) -> None:
             'TEAM:',
             f"✅{team_positive}",
             f"❌{team_negative}",
-            f"📈{round(float(team_roi), 3)}%",
-            f"💰{round(float(team_profit), 2)}K"
+            f"📈{team_roi}%",
+            f"💰{team_profit}K"
         ],
         [
             'POOL:',
@@ -157,9 +157,9 @@ async def show_statistics(message: types.Message) -> None:
         ]
     ]
     table = tabulate.tabulate(data, tablefmt="plain")
-    statistics_text = f"📊 <b>СТАТИСТИКА</b> 📊\n" \
+    statistics_text = f"📊 <b>СТАТИСТИКА</b> 📊\n\n" \
         f"<pre>{table}</pre>\n\n" \
-        "Все расчеты выполнены с учетом\nпостоянной ставки в 1000 ₽\n\n" \
+        "* <i>Все расчеты выполнены с учетом постоянной ставки в 1000 ₽</i>\n\n" \
         "Условные обозначения:\n" \
         "✅ - количество побед\n❌ - количество поражений\n📈 - процент выигрыша на одну ставку (ROI)\n💰 - чистая прибыль за все время"
     
