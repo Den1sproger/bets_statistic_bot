@@ -7,7 +7,7 @@ PROMPT_VIEW_NICKNAMES = "SELECT nickname FROM users;"
 PROMPT_VIEW_USERNAMES = "SELECT username FROM users;"
 PROMPT_VIEW_CURRENT_CHAT_iDS = "SELECT chat_id FROM current_questions;"
 PROMPT_VIEW_GAMES = "SELECT * FROM games;"
-PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi FROM users WHERE username='poole';"
+PROMPT_VIEW_POOLE_STAT = "SELECT positive_bets, negative_bets, roi, coeff_sum FROM users WHERE username='poole';"
 PROMPT_VIEW_TEAMS = "SELECT team_name FROM teams;"
 
 
@@ -102,7 +102,7 @@ def get_prompt_decrease_current_index(chat_id: str)-> str:
 
 
 def get_prompt_view_user_stat(chat_id: str) -> str:
-    return f"SELECT positive_bets, negative_bets, roi FROM users WHERE chat_id='{chat_id}';"
+    return f"SELECT positive_bets, negative_bets, roi, coeff_sum FROM users WHERE chat_id='{chat_id}';"
 
 
 def get_prompt_view_user_team(chat_id: str) -> str:
@@ -110,7 +110,7 @@ def get_prompt_view_user_team(chat_id: str) -> str:
 
 
 def get_prompt_view_team_stat(team_name: str) -> str:
-    return f"SELECT positive_bets, negative_bets, roi FROM teams WHERE team_name='{team_name}';"
+    return f"SELECT positive_bets, negative_bets, roi, coeff_sum FROM teams WHERE team_name='{team_name}';"
 
 
 def get_prompt_view_teammates(team_name: str,

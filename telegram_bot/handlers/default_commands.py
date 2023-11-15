@@ -1,3 +1,5 @@
+import tabulate
+
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
@@ -88,9 +90,14 @@ async def show_statistics(message: types.Message) -> None:
     user_stat = db.get_data_list(
         get_prompt_view_user_stat(user_chat_id)
     )[0]
-    user_roi = user_stat['roi']
+    user_roi = round(user_stat['roi'], 3)
+    user_profit = user_stat['coeff_sum'] - user_stat['positive_bets'] - user_stat['negative_bets']
+    user_profit = round(user_profit, 2)
+
     if user_roi > 0:
         user_roi = f'+{user_roi}'
+    if user_profit > 0:
+        user_profit = f"+{user_profit}"
 
     # team statistics
     user_team = db.get_data_list(
@@ -103,29 +110,61 @@ async def show_statistics(message: types.Message) -> None:
         team_positive = team_stat['positive_bets']
         team_negative = team_stat['negative_bets']
         team_roi = team_stat['roi']
+        team_profit = team_stat['coeff_sum'] - team_positive - team_negative
+
         if team_roi > 0:
             team_roi = f'+{team_roi}'
+        if team_profit > 0:
+            team_profit = f'+{team_profit}'
     else:
         team_positive = 0
         team_negative = 0
         team_roi = 0
+        team_profit = 0
 
     # poole statistics
     poole_stat = db.get_data_list(PROMPT_VIEW_POOLE_STAT)[0]
-    poole_roi = poole_stat['roi']
+    poole_roi = round(poole_stat['roi'], 3)
+    poole_profit = poole_stat['coeff_sum'] - poole_stat['positive_bets'] - poole_stat['negative_bets']
+    poole_profit = round(poole_profit, 2)
+
     if poole_roi > 0:
         poole_roi = f'+{poole_roi}'
-
+    if poole_profit > 0:
+        poole_profit = f'+{poole_profit}'
     # message
-    statistics_text = f"""
-    <b>СТАТИСТИКА</b>
-Стат мой:         ✅{user_stat['positive_bets']}    ❌{user_stat['negative_bets']}    ROI {user_roi}
-Стат команды:✅{team_positive}    ❌{team_negative}    ROI {team_roi}
-Стат пула:        ✅{poole_stat['positive_bets']}    ❌{poole_stat['negative_bets']}    ROI {poole_roi}
-    """
+
+    data = [
+        [
+            'MY:',
+            f"✅{user_stat['positive_bets']}",
+            f"❌{user_stat['negative_bets']}",
+            f"📈{user_roi}%", f"💰{user_profit}K"
+        ],
+        [
+            'TEAM:',
+            f"✅{team_positive}",
+            f"❌{team_negative}",
+            f"📈{round(float(team_roi), 3)}%",
+            f"💰{round(float(team_profit), 2)}K"
+        ],
+        [
+            'POOL:',
+            f"✅{poole_stat['positive_bets']}",
+            f"❌{poole_stat['negative_bets']}",
+            f"📈{poole_roi}%",
+            f"💰{poole_profit}K"
+        ]
+    ]
+    table = tabulate.tabulate(data, tablefmt="plain")
+    statistics_text = f"📊 <b>СТАТИСТИКА</b> 📊\n" \
+        f"<pre>{table}</pre>\n\n" \
+        "Все расчеты выполнены с учетом\nпостоянной ставки в 1000 ₽\n\n" \
+        "Условные обозначения:\n" \
+        "✅ - количество побед\n❌ - количество поражений\n📈 - процент выигрыша на одну ставку (ROI)\n💰 - чистая прибыль за все время"
     
     await message.answer(text=statistics_text,
-                         parse_mode='HTML',
+                         parse_mode=types.ParseMode.HTML,
                          reply_markup=main_kb)
 
 
