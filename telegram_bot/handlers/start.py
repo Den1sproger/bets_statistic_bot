@@ -39,6 +39,9 @@ async def start(message: types.Message) -> None:
     else:
         with open(START_PHOTO_PATH, 'rb') as file:
             await message.answer_photo(photo=types.InputFile(file), reply_markup=main_kb)
+        await bot.set_my_commands(
+            default_commands, scope=BotCommandScopeChat(message.chat.id)
+        )
     
 
 
